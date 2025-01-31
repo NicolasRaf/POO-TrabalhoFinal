@@ -17,14 +17,17 @@ export class Profile {
         this._friends = friends;
         this._posts = posts;
     }
-    
+
+    set status(status: boolean) {
+        this._status = status;
+    }
+
     private throwError( condition: boolean, message: string) {
         if (condition) {
             throw new Error(message);
         }
     };
     
-
     private addFriend(friend: Profile) {
         this.throwError(this._friends.includes(friend), "Friend already exists");
 
@@ -32,17 +35,13 @@ export class Profile {
     }
 
     private removeFriend(friend: Profile) {
-        if (!this._friends.includes(friend)) {
-            throw new Error("Friend not included");
-        }
+        this.throwError(!this._friends.includes(friend), "Friend does not exist");
 
         this._friends.splice(this._friends.indexOf(friend), 1);
     }   
 
     private addPost(post: Post) {
-        if (this._posts.includes(post)) {
-            throw new Error("This post already exists");
-        }
+        this.throwError(this._posts.includes(post), "Post already exists");
 
         this._posts.includes(post);
 
