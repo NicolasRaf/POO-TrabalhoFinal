@@ -1,49 +1,68 @@
 import { Post } from "./post";
+import { AlreadyExistsError, NotFoundError } from "../errs";
+
+
 export class Profile {
-    private _id: string;
-    private _name: string
-    private _photo: string;
-    private _email: string;
-    private _status: boolean;
-    private _friends: Profile[];
-    private _posts: Post[];
+  private _id: string;
+  private _name: string;
+  private _photo: string;
+  private _email: string;
+  private _status: boolean;
+  private _friends: Profile[];
+  private _posts: Post[];
 
-    constructor(id: string, name: string, photo: string, email: string, status: boolean, friends: Profile[], posts: Post[]) {
-        this._id = id;
-        this._name = name;  
-        this._photo = photo;
-        this._email = email;    
-        this._status = status;
-        this._friends = friends;
-        this._posts = posts;
+  constructor(id: string, name: string, photo: string, email: string, status: boolean, friends: Profile[], posts: Post[]) {
+    this._id = id;
+    this._name = name;
+    this._photo = photo;
+    this._email = email;
+    this._status = status;
+    this._friends = friends;
+    this._posts = posts;
+  }
+
+  get email() {
+    return this._email;
+  }
+
+  get id() {
+    return this._id;
+  } 
+
+  get name() {
+    return this._name;
+  }
+
+  set status(status: boolean) {
+    this._status = status;
+  }
+
+  private addFriend(friend: Profile) {
+    if (this._friends.includes(friend)) {
+      throw new AlreadyExistsError("Amigo já adicionado.");
     }
+    this._friends.push(friend);
+  }
 
-    set status(status: boolean) {
-        this._status = status;
+  private removeFriend(friend: Profile) {
+    const index = this._friends.indexOf(friend);
+    if (index === -1) {
+      throw new NotFoundError("Amigo não encontrado.");
     }
+    this._friends.splice(index, 1);
+  }
 
-    private throwError( condition: boolean, message: string) {
-        if (condition) {
-            throw new Error(message);
-        }
-    };
-    
-    private addFriend(friend: Profile) {
-        this.throwError(this._friends.includes(friend), "Friend already exists");
-
-        this._friends.push(friend);
+  private addPost(post: Post) {
+    if (this._posts.includes(post)) {
+      throw new AlreadyExistsError("Post já existe.");
     }
+    this._posts.push(post);
+  }
 
-    private removeFriend(friend: Profile) {
-        this.throwError(!this._friends.includes(friend), "Friend does not exist");
-
-        this._friends.splice(this._friends.indexOf(friend), 1);
-    }   
-
-    private addPost(post: Post) {
-        this.throwError(this._posts.includes(post), "Post already exists");
-
-        this._posts.includes(post);
-
-    }
+  public showProfile() {
+    console.log(`Nome: ${this._name}`);
+    console.log(`Foto: ${this._photo}`);
+    console.log(`Email: ${this._email}`);
+    console.log(`Status: ${this._status ? "Online" : "Offline"}`);
+  }
 }

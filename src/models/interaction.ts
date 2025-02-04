@@ -1,10 +1,5 @@
 import { Profile } from "./profile";
-enum InteractionType {
-    "curtir" = "👍",
-    "não curtir" = "👎",
-    "riso" = "🤣",
-    "surpresa" = "😯"
-}
+import { InteractionType } from "../enum/interactions";
 
 export class Interaction {
     private _id: number;

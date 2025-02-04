@@ -11,4 +11,8 @@ export class Post {
         this._date = date;
         this._profile = profile;
     }
+
+    get content() { 
+        return this._content; 
+    }
 }
