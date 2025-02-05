@@ -1,41 +1,78 @@
-import { input } from "../utils/io";
+import readline from "readline";
+import { ApplicationError } from "../errs";
 import { ItemMenu } from "./item_menu";
+import { pressEnter } from "../utils/io";
 
 export class Menu {
     private items: ItemMenu[] = [];
+    private selectedIndex = 0;
+    private running = false;
 
-    // Adiciona um novo item ao menu
-    public addItem(name: string, func: () => void): void {
-        this.items.push(new ItemMenu(name, func));
+    public fillMenu(itens: ItemMenu[]): void {
+        this.items = itens;
     }
 
-    // Exibe os itens do menu
-    public showItems(): void {
-        console.log("Menu de Opções:");
+    private showItems(): void {
+        console.clear();
+        console.log("=".repeat(20) + " Menu " + "=".repeat(20));
         this.items.forEach((item, index) => {
-            console.log(`${index + 1}. ${item.name}`);
+            const prefix = this.selectedIndex === index ? "> " : "  ";
+            console.log(`${prefix}${item.name}`);
         });
+        console.log("=".repeat(46));
+        console.log("Pressione ESC para sair.");
     }
 
-    // Executa a função correspondente ao item selecionado
-    public selectItem(index: number): void {
-        if (index < 0 || index >= this.items.length) {
-            console.log("Opção inválida. Tente novamente.");
-            return;
-        }
-        this.items[index].callback(); // Chama a função associada ao item
-    }
-
-    // Método para iniciar o menu e interagir com o usuário
     public start(): void {
-        this.addItem("Dizer Oi", () => console.log("Oi!"));
-        this.addItem("Dizer Tchau", () => console.log("Tchau!"));
-        
+        if (this.running) return; // Evita múltiplas execuções
+        this.running = true;
+
+        readline.emitKeypressEvents(process.stdin);
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+
         this.showItems();
+        this.listenKeys();
+    }
 
-        const userChoice: string = input("Escolha uma opção:"); 
-        const choiceIndex = parseInt(userChoice) - 1; 
+    private listenKeys(): void {
+        process.stdin.on("keypress", (_, key) => {
+            if (!this.running) return;
 
-        this.selectItem(choiceIndex);
+            if (key.name === "up") {
+                this.selectedIndex = (this.selectedIndex - 1 + this.items.length) % this.items.length;
+            } else if (key.name === "down") {
+                this.selectedIndex = (this.selectedIndex + 1) % this.items.length;
+            } else if (key.name === "return") {
+                console.clear();
+                this.running = false;
+                process.stdin.setRawMode(false);
+                process.stdin.removeAllListeners("keypress");
+
+                try {
+                    this.items[this.selectedIndex].callback();
+                } catch (error) {
+                    if (error instanceof ApplicationError) {
+                        console.log(error.message);
+                    } else {
+                        console.log("Ocorreu um erro inesperado.");
+                    }
+                }
+
+                pressEnter();
+                this.start();
+
+                return;
+            } else if (key.name === "escape") {
+                console.clear();
+                console.log("Saindo do menu...");
+                this.running = false;
+                process.stdin.setRawMode(false);
+                process.stdin.removeAllListeners("keypress");
+                process.exit();
+            }
+
+            this.showItems();
+        });
     }
 }

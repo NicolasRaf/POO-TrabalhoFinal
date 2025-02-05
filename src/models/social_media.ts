@@ -40,7 +40,7 @@ export class SocialMedia {
         }
           
         return profiles;
-    }
+    }   
     
     
     public listProfiles(profiles: Profile[] = this._profiles): Profile[] {

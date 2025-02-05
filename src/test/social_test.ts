@@ -5,10 +5,10 @@ import { NotFoundError } from "../errs";
 
 function main() {
     const socialMedia = new SocialMedia();
-    socialMedia.addProfile(new Profile("1", "José", "👺", "email@gmail.com", true, [], []));
-    socialMedia.addProfile(new Profile("2", "José", "💩", "email2@gmail.com", true, [], []));
-    socialMedia.addProfile(new Profile("3", "Maria", "👽", "email3@gmail.com", true, [], []));
-    socialMedia.addProfile(new Profile("4", "Aline", "👻", "email4@gmail.com", true, [], []));
+    socialMedia.addProfile(new Profile("1", "José", "👺", "email@gmail.com", "oi", true, [], []));
+    socialMedia.addProfile(new Profile("2", "José", "💩", "email2@gmail.com", "oi",true, [], []));
+    socialMedia.addProfile(new Profile("3", "Maria", "👽", "email3@gmail.com","oi", true, [], []));
+    socialMedia.addProfile(new Profile("4", "Aline", "👻", "email4@gmail.com", "oi",true, [], []));
 
     // Listagem de perfis com nome "José"
     console.log("\nListagem de todos os perfis com o nome 'José':");
