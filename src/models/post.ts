@@ -15,4 +15,8 @@ export class Post {
     get content() { 
         return this._content; 
     }
+
+    get id() {
+        return this._id;
+    }
 }

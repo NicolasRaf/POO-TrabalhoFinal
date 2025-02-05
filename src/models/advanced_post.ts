@@ -1,15 +1,16 @@
+import { NotFoundError } from "../errs";
 import { Post, Interaction } from "./";
 
 export class AdvancedPost extends Post {
     private _interactions: Interaction[] = [];
 
-    private addInteraction(interaction: Interaction) {
+    public addInteraction(interaction: Interaction) {
         this._interactions.push(interaction);
     }
 
     private listInteractions() {
         if (this._interactions.length === 0) {
-            throw new Error("Error: No interactions found");
+            throw new NotFoundError("No interactions found.");
         }
 
         return this._interactions;

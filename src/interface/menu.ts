@@ -4,19 +4,20 @@ import { ItemMenu } from "./item_menu";
 import { pressEnter } from "../utils/io";
 
 export class Menu {
-    private items: ItemMenu[] = [];
-    private selectedIndex = 0;
-    private running = false;
+    private _items: ItemMenu[] = [];
+    private _selectedIndex = 0;
+    private _running = false;
 
-    public fillMenu(itens: ItemMenu[]): void {
-        this.items = itens;
+
+    constructor(items: ItemMenu[]) {
+        this._items = items;
     }
 
     private showItems(): void {
         console.clear();
         console.log("=".repeat(20) + " Menu " + "=".repeat(20));
-        this.items.forEach((item, index) => {
-            const prefix = this.selectedIndex === index ? "> " : "  ";
+        this._items.forEach((item, index) => {
+            const prefix = this._selectedIndex === index ? "> " : "  ";
             console.log(`${prefix}${item.name}`);
         });
         console.log("=".repeat(46));
@@ -24,8 +25,8 @@ export class Menu {
     }
 
     public start(): void {
-        if (this.running) return; // Evita múltiplas execuções
-        this.running = true;
+        if (this._running) return; 
+        this._running = true;
 
         readline.emitKeypressEvents(process.stdin);
         process.stdin.setRawMode(true);
@@ -37,20 +38,20 @@ export class Menu {
 
     private listenKeys(): void {
         process.stdin.on("keypress", (_, key) => {
-            if (!this.running) return;
+            if (!this._running) return;
 
             if (key.name === "up") {
-                this.selectedIndex = (this.selectedIndex - 1 + this.items.length) % this.items.length;
+                this._selectedIndex = (this._selectedIndex - 1 + this._items.length) % this._items.length;
             } else if (key.name === "down") {
-                this.selectedIndex = (this.selectedIndex + 1) % this.items.length;
+                this._selectedIndex = (this._selectedIndex + 1) % this._items.length;
             } else if (key.name === "return") {
                 console.clear();
-                this.running = false;
+                this._running = false;
                 process.stdin.setRawMode(false);
                 process.stdin.removeAllListeners("keypress");
 
                 try {
-                    this.items[this.selectedIndex].callback();
+                    this._items[this._selectedIndex].callback();
                 } catch (error) {
                     if (error instanceof ApplicationError) {
                         console.log(error.message);
@@ -66,7 +67,7 @@ export class Menu {
             } else if (key.name === "escape") {
                 console.clear();
                 console.log("Saindo do menu...");
-                this.running = false;
+                this._running = false;
                 process.stdin.setRawMode(false);
                 process.stdin.removeAllListeners("keypress");
                 process.exit();

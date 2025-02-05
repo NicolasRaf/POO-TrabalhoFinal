@@ -43,7 +43,7 @@ export class Profile {
     this._status = status;
   }
 
-  private addFriend(friend: Profile) {
+  public addFriend(friend: Profile) {
     if (this._friends.includes(friend)) {
       throw new AlreadyExistsError("Amigo já adicionado.");
     }
