@@ -2,25 +2,27 @@ import readline from "readline";
 import { ApplicationError } from "../errs";
 import { ItemMenu } from "./item_menu";
 import { pressEnter } from "../utils/io";
+import { ActionDispatcher } from "./actions_dispatcher";
 
 export class Menu {
-    private _items: ItemMenu[] = [];
+    private _items: string[] = [];
     private _selectedIndex = 0;
     private _running = false;
+    private _currentCategory: string;
 
-
-    constructor(items: ItemMenu[]) {
-        this._items = items;
+    constructor(category: string) {
+        this._currentCategory = category;
+        this._items = ActionDispatcher.listActions(category);
     }
 
     private showItems(): void {
         console.clear();
-        console.log("=".repeat(20) + " Menu " + "=".repeat(20));
+        console.log(`===== ${this._currentCategory} =====`);
         this._items.forEach((item, index) => {
             const prefix = this._selectedIndex === index ? "> " : "  ";
-            console.log(`${prefix}${item.name}`);
+            console.log(`${prefix}${item}`);
         });
-        console.log("=".repeat(46));
+        console.log("============================");
         console.log("Pressione ESC para sair.");
     }
 
@@ -50,18 +52,11 @@ export class Menu {
                 process.stdin.setRawMode(false);
                 process.stdin.removeAllListeners("keypress");
 
-                try {
-                    this._items[this._selectedIndex].callback();
-                } catch (error) {
-                    if (error instanceof ApplicationError) {
-                        console.log(error.message);
-                    } else {
-                        console.log("Ocorreu um erro inesperado.");
-                    }
-                }
+                const actionName = this._items[this._selectedIndex];
+                ActionDispatcher.executeAction(actionName); // Executa a ação correspondente
 
-                pressEnter();
-                this.start();
+                console.log("Pressione Enter para voltar ao menu.");
+                process.stdin.once("data", () => this.start());
 
                 return;
             } else if (key.name === "escape") {
