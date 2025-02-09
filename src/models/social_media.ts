@@ -80,7 +80,7 @@ export class SocialMedia {
             console.log(`\nPost de ID ${post.id}`);
 
             console.log("=".repeat(30));
-            post.showContent();
+            post.showPost();
             console.log("=".repeat(30));
         };  
 

@@ -1,11 +1,11 @@
 import { readFileSync } from "fs";
-import { Post, Profile } from "../models";
+import { join } from "path";
 
 export class DataReader {
 
     public static readProfiles(): any[] {
-        const filePath = (__filename === "app.ts") ? "../src/data/profiles.json" : "../../src/data/profiles.json";
-    
+        const filePath: string = join(__dirname, '..', '..', 'src', 'data', 'profiles.json');
+        
         try {
             const data = readFileSync(filePath, "utf-8");
             const profiles: any[] = JSON.parse(data);
@@ -18,13 +18,13 @@ export class DataReader {
     }
 
     public static readPosts(): any[] {
-        const filePath = (__filename === "app.ts") ? "../src/data/profiles.json" : "../../src/data/profiles.json";
-    
+        const filePath = join(__dirname, '..', '..', 'src', 'data', 'posts.json');
+        
         try {
             const data = readFileSync(filePath, "utf-8");
-            const profiles: any[] = JSON.parse(data);
+            const posts: any[] = JSON.parse(data);
             
-            return profiles;
+            return posts;
         } catch (error) {
             console.error("Error reading data:", error);
             return [];
