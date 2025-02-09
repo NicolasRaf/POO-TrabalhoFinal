@@ -3,8 +3,8 @@ import { join } from "path";
 
 export class DataReader {
 
-    private static readJsonFile(fileName: string): any[] {
-        const filePath = join(__dirname, '..', "..", "src", 'data', fileName);
+    public static readData(fileName: string): any[] {
+        const filePath = join(__dirname, '..', "..", "src", 'data', `${fileName}.json`);
 
         try {
             const data = readFileSync(filePath, "utf-8");
@@ -13,13 +13,5 @@ export class DataReader {
             console.error(`Erro ao ler o arquivo ${fileName}:`, error);
             return [];
         }
-    }
-
-    public static readProfiles(): any[] {
-        return this.readJsonFile("profiles.json");
-    }
-
-    public static readPosts(): any[] {
-        return this.readJsonFile("posts.json");
     }
 }

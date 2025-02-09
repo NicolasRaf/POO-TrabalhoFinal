@@ -2,7 +2,7 @@
   {
     "_id": "1",
     "_content": "Post 1",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "5",
       "_name": "Miguel",
@@ -10,14 +10,14 @@
       "_email": "email5@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "2",
     "_content": "Post 2",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "6",
       "_name": "Ana",
@@ -25,14 +25,14 @@
       "_email": "email6@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "3",
     "_content": "Post 3",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "7",
       "_name": "Pedro",
@@ -40,14 +40,14 @@
       "_email": "email7@gmail.com",
       "_password": "Oi",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "4",
     "_content": "Post 4",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "5",
       "_name": "Miguel",
@@ -55,14 +55,14 @@
       "_email": "email5@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "5",
     "_content": "Post 5",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "6",
       "_name": "Ana",
@@ -70,14 +70,14 @@
       "_email": "email6@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "6",
     "_content": "Post 6",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "7",
       "_name": "Pedro",
@@ -85,14 +85,14 @@
       "_email": "email7@gmail.com",
       "_password": "Oi",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "7",
     "_content": "Post 7",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "5",
       "_name": "Miguel",
@@ -100,14 +100,14 @@
       "_email": "email5@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "8",
     "_content": "Post 8",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "6",
       "_name": "Ana",
@@ -115,14 +115,14 @@
       "_email": "email6@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "9",
     "_content": "Post 9",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "7",
       "_name": "Pedro",
@@ -130,14 +130,14 @@
       "_email": "email7@gmail.com",
       "_password": "Oi",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "10",
     "_content": "Post 10",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "5",
       "_name": "Miguel",
@@ -145,14 +145,14 @@
       "_email": "email5@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "11",
     "_content": "Post 11",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "6",
       "_name": "Ana",
@@ -160,14 +160,14 @@
       "_email": "email6@gmail.com",
       "_password": "Olá",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   },
   {
     "_id": "12",
     "_content": "Post 12",
-    "_date": "2025-02-09T03:15:17.349Z",
+    "_date": "2025-02-09T17:37:59.629Z",
     "_profile": {
       "_id": "7",
       "_name": "Pedro",
@@ -175,7 +175,7 @@
       "_email": "email7@gmail.com",
       "_password": "Oi",
       "_status": true,
-      "_friends": [],
+      "friends": [],
       "_posts": []
     }
   }

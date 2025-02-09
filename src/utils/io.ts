@@ -27,7 +27,7 @@ export function pressEnter(): void {
     input("Press Enter to continue...");
 }
 
-export function promptInput(promptMessage: string, errorMessage: string): string {
+export function promptInput(promptMessage: string, errorMessage: string): string {    
     let inputVal: string;
     do {
         inputVal = input(promptMessage).trim();

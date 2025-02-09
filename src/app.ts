@@ -13,7 +13,7 @@ export class App {
     constructor() {
         this._socialMedia = new SocialMedia();
         this._registerActions(); 
-        this._menu = new Menu(Categories.Aut);
+        this._menu = new Menu(Categories.Princ);
 
 		this.loadData();
         console.log("Iniciando o app...");
@@ -23,9 +23,11 @@ export class App {
         const actions = [
             { name: "Listar todos os perfis", category: Categories.Princ, action: () => this._socialMedia.listProfiles() },
             { name: "Listar perfis com nome 'José'", category: Categories.Princ, action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
+            { name: "Listar todos os posts", category: Categories.Princ, action: () => this._socialMedia.listPosts() },
             { name: "Cadastro", category: Categories.Aut, action: () => this.register() },
             { name: "Login", category: Categories.Aut, action: () => this.login() },
-            { name: "Carregar dados", category: Categories.Princ, action: () => this.loadData() }
+            { name: "Carregar dados", category: Categories.Princ, action: () => this.loadData() },
+            { name: "Salvar dados", category: Categories.Princ, action: () => this.saveData() },
         ];
 
         actions.forEach(({ name, category, action }) => {
@@ -38,8 +40,8 @@ export class App {
     }
 
     public login(): void {
-        const email = input("Email: ");
-        const password = input("Senha: ");
+        const email = inputEmail();
+        const password = promptInput("Senha: ", "A senha não pode estar vazia.");
         let user: Profile;
 
         try {
@@ -56,10 +58,8 @@ export class App {
 
     public register(): void {
 		const username = promptInput("Nome de usuário: ", "O nome de usuário não pode estar vazio.");
-		console.log(`DEBUG: username recebido -> "${username}"`);
-
 		const email = inputEmail();
-		const password = promptInput("Senha: ", "A se nha não pode estar vazia.");
+		const password = promptInput("Senha: ", "A senha não pode estar vazia.");
 	
 		const status: boolean = true;
 		const friends: Profile[] = [];
@@ -126,8 +126,9 @@ export class App {
     }
 
     public saveData(): void {
-        DataSaver.saveProfiles(this._socialMedia.profiles);
-        DataSaver.savePosts(this._socialMedia.posts);
+        console.warn("Salvando dados...");
+        DataSaver.saveData(this._socialMedia.profiles);
+        DataSaver.saveData(this._socialMedia.posts);
     }
 
     public loadData(): void {
@@ -137,7 +138,7 @@ export class App {
         }
     
         // Carregar perfis
-        const profilesData: any[] = DataReader.readProfiles();
+        const profilesData: any[] = DataReader.readData("profiles");
         const profilesMap: Map<string, Profile> = new Map();
     
         profilesData.forEach(profileData => {
@@ -166,18 +167,17 @@ export class App {
         });
     
         // Carregar posts
-        const postsData: any[] = DataReader.readPosts();
-        postsData.forEach(postData => {
-            // Encontra o perfil que fez o post
-            const profile = profilesMap.get(postData._profileId);
-            if (!profile) {
-                console.warn(`Perfil não encontrado para o post com ID ${postData._id}`);
-                return; // Ignorar posts sem perfil válido
-            }
-            const newPost = new Post(postData._id, postData._content, postData._date, profile);
-            this._socialMedia.addPost(newPost); // Adicionar cada post individualmente
-        });
-    
-        console.log("Dados carregados com sucesso!");
+        const postsData: any[] = DataReader.readData("posts").reverse();
+		const posts: Post[] = postsData.map((post) => {
+			const profile = post._profile && post._profile._id ? 
+            this._socialMedia.searchProfile(post._profile._id)[0] : undefined;
+			return new Post(
+				post._id,
+				post._content,
+				post._date,
+				profile
+			);
+		});
+		this._socialMedia.posts = posts;
     }
 }

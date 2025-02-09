@@ -56,7 +56,7 @@ export class Menu {
     private listenKeys(): void {
         process.stdin.on("keypress", (_, key) => {
             if (!this._running) return;
-    
+
             if (key.name === "up") {
                 this._selectedIndex = (this._selectedIndex - 1 + this._items.length) % this._items.length;
             } else if (key.name === "down") {
@@ -66,28 +66,28 @@ export class Menu {
                 this._running = false;
                 process.stdin.setRawMode(false);
                 process.stdin.removeAllListeners("keypress");
-    
+
                 this.showHeader();  
                 try {
-                    // Aqui removemos o `process.stdin.resume()` e o `process.stdin.once('data', () => {});`
                     ActionDispatcher.executeAction(actionName); 
                 } catch (err) {
                     console.error((err as ApplicationError).message);   
                 }
-    
+
                 console.log("\nPressione Enter para voltar ao menu.");
-                process.stdin.once("data", () => this.start()); // Espera a tecla 'Enter' para voltar ao menu
-    
+                process.stdin.once("data", () => this.start());
+
                 return;
             } else if (key.name === "escape") {
                 console.clear();
+                ActionDispatcher.executeAction("Salvar dados");
                 console.log("Saindo do menu...");
                 this._running = false;
                 process.stdin.setRawMode(false);
                 process.stdin.removeAllListeners("keypress");
                 process.exit();
             }
-    
+
             this.showItems();
         });
     }
