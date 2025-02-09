@@ -2,7 +2,7 @@ import { ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
 import { ItemMenu } from "./interface/item_menu";
 import { Menu } from "./interface/menu";
 import { SocialMedia, Profile } from "./models";
-import { input } from "./utils/io";
+import { input, DataReader, DataSaver } from "./utils";
 
 export class App {
     private _socialMedia: SocialMedia;
@@ -21,7 +21,8 @@ export class App {
         new ItemMenu("Listar todos os perfis", () => { this._socialMedia.listProfiles() } ),
         new ItemMenu("Listar todos os perfis com o nome 'José'", () => { this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) } ),
       ];
-    }
+    }   
+
 
     public run(): void {
         this._menu.start();
@@ -30,4 +31,8 @@ export class App {
     public login(): void {
     }
 
-}
+    public saveData(): void {
+        DataSaver.saveProfiles(this._socialMedia.profiles);
+        DataSaver.savePosts(this._socialMedia.posts);
+    }
+}   

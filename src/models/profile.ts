@@ -39,6 +39,18 @@ export class Profile {
     return this._name;
   }
 
+  get photo() {
+    return this._photo;
+  }
+
+  get friends() {
+    return this._friends;
+  }
+
+  get posts() {
+    return this._posts;
+  }
+
   set status(status: boolean) {
     this._status = status;
   }
