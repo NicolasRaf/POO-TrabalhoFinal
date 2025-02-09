@@ -1,9 +1,6 @@
 import { InteractionType } from "../enum/interactions";
 import { AlreadyExistsError, NotFoundError } from "../errs";
-import { AdvancedPost } from "./advanced_post";
-import { Interaction } from "./interaction";
-import { Post } from "./post";
-import { Profile } from "./profile";
+import { Interaction, Profile, AdvancedProfile, Post, AdvancedPost } from "./"
 
 export class SocialMedia {
     private _profiles: Profile[];
@@ -20,11 +17,22 @@ export class SocialMedia {
         return this._profiles;
     }
 
+    get posts(): Post[] {
+        return this._posts;
+    }
+
     public addProfile(profile: Profile) {
         if (this._profiles.includes(profile)) {
             throw new AlreadyExistsError("Perfil ja cadastrado.");
         }
         this._profiles.push(profile);
+    }
+
+    public addPost(post: Post) {
+        if (this._posts.includes(post)) {
+            throw new AlreadyExistsError("Post ja cadastrado.");
+        }
+        this._posts.push(post);
     }
 
     public searchProfile(identifier: string): Profile[] {
@@ -69,6 +77,22 @@ export class SocialMedia {
         };  
 
         return this._profiles;
+    }
+
+    public listPosts(posts: Post[] = this._posts): Post[] {
+        if (this._posts.length === 0) {
+            throw new NotFoundError("Nenhum post cadastrado.");
+        }
+
+        for (let post of posts) {
+            console.log(`\nPost de ID ${post.id}`);
+
+            console.log("=".repeat(30));
+            post.showContent();
+            console.log("=".repeat(30));
+        };  
+
+        return this._posts;
     }
 
     public switchProfileStatus(identifier: string): void {

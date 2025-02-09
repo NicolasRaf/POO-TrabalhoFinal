@@ -12,11 +12,23 @@ export class Post {
         this._profile = profile;
     }
 
-    get content() { 
+    get content(): string { 
         return this._content; 
     }
 
-    get id() {
+    get id(): string {
         return this._id;
+    }
+
+    get date(): Date {
+        return this._date;
+    }
+
+    get profile(): Profile {
+        return this._profile;
+    }
+
+    public showContent() { 
+        console.log(this._content); 
     }
 }

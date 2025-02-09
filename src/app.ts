@@ -2,7 +2,7 @@ import { ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
 import { ActionDispatcher } from "./interface/actions_dispatcher";
 import { Menu } from "./interface/menu";
 import { SocialMedia, Profile } from "./models";
-import { input } from "./utils/io";
+import { input, DataReader, DataSaver } from "./utils";
 
 export class App {
     private _socialMedia: SocialMedia;
@@ -36,4 +36,9 @@ export class App {
     public login(): void {
         console.log("Executando login...");
     }
-}
+ 
+    public saveData(): void {
+        DataSaver.saveProfiles(this._socialMedia.profiles);
+        DataSaver.savePosts(this._socialMedia.posts);
+    }
+}   

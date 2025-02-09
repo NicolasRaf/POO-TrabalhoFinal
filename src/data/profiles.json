@@ -1,0 +1,270 @@
+[
+  {
+    "_id": "5",
+    "_name": "Miguel",
+    "_photo": "😎",
+    "_email": "email5@gmail.com",
+    "_password": "Olá",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "6",
+    "_name": "Ana",
+    "_photo": "🌟",
+    "_email": "email6@gmail.com",
+    "_password": "Olá",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "7",
+    "_name": "Pedro",
+    "_photo": "🕵️‍♂️",
+    "_email": "email7@gmail.com",
+    "_password": "Oi",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "8",
+    "_name": "Laura",
+    "_photo": "👩‍🚀",
+    "_email": "email8@gmail.com",
+    "_password": "Oi",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "9",
+    "_name": "Carlos",
+    "_photo": "🎨",
+    "_email": "email9@gmail.com",
+    "_password": "Olá",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "10",
+    "_name": "Mariana",
+    "_photo": "👩‍🍳",
+    "_email": "email10@gmail.com",
+    "_password": "Olá",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "11",
+    "_name": "Lucas",
+    "_photo": "🤹‍♂️",
+    "_email": "email11@gmail.com",
+    "_password": "Oi",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "12",
+    "_name": "Fernanda",
+    "_photo": "👩‍🎤",
+    "_email": "email12@gmail.com",
+    "_password": "Oi",
+    "_status": true,
+    "_friends": [],
+    "_posts": []
+  },
+  {
+    "_id": "1",
+    "_name": "José",
+    "_photo": "👺",
+    "_email": "email@gmail.com",
+    "_password": "pass1",
+    "_status": true,
+    "_friends": [
+      {
+        "_id": "5",
+        "_name": "Miguel",
+        "_photo": "😎",
+        "_email": "email5@gmail.com",
+        "_password": "Olá",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      },
+      {
+        "_id": "6",
+        "_name": "Ana",
+        "_photo": "🌟",
+        "_email": "email6@gmail.com",
+        "_password": "Olá",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      }
+    ],
+    "_posts": [
+      {
+        "_id": "1",
+        "_content": "Post 1",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "2",
+        "_content": "Post 2",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "3",
+        "_content": "Post 3",
+        "_date": "2025-02-09T02:33:38.793Z"
+      }
+    ]
+  },
+  {
+    "_id": "2",
+    "_name": "João",
+    "_photo": "💩",
+    "_email": "email2@gmail.com",
+    "_password": "pass2",
+    "_status": true,
+    "_friends": [
+      {
+        "_id": "7",
+        "_name": "Pedro",
+        "_photo": "🕵️‍♂️",
+        "_email": "email7@gmail.com",
+        "_password": "Oi",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      },
+      {
+        "_id": "8",
+        "_name": "Laura",
+        "_photo": "👩‍🚀",
+        "_email": "email8@gmail.com",
+        "_password": "Oi",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      }
+    ],
+    "_posts": [
+      {
+        "_id": "4",
+        "_content": "Post 4",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "5",
+        "_content": "Post 5",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "6",
+        "_content": "Post 6",
+        "_date": "2025-02-09T02:33:38.793Z"
+      }
+    ]
+  },
+  {
+    "_id": "3",
+    "_name": "Maria",
+    "_photo": "👽",
+    "_email": "email3@gmail.com",
+    "_password": "pass3",
+    "_status": true,
+    "_friends": [
+      {
+        "_id": "9",
+        "_name": "Carlos",
+        "_photo": "🎨",
+        "_email": "email9@gmail.com",
+        "_password": "Olá",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      },
+      {
+        "_id": "10",
+        "_name": "Mariana",
+        "_photo": "👩‍🍳",
+        "_email": "email10@gmail.com",
+        "_password": "Olá",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      }
+    ],
+    "_posts": [
+      {
+        "_id": "7",
+        "_content": "Post 7",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "8",
+        "_content": "Post 8",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "9",
+        "_content": "Post 9",
+        "_date": "2025-02-09T02:33:38.793Z"
+      }
+    ]
+  },
+  {
+    "_id": "4",
+    "_name": "Aline",
+    "_photo": "👻",
+    "_email": "email4@gmail.com",
+    "_password": "pass4",
+    "_status": true,
+    "_friends": [
+      {
+        "_id": "11",
+        "_name": "Lucas",
+        "_photo": "🤹‍♂️",
+        "_email": "email11@gmail.com",
+        "_password": "Oi",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      },
+      {
+        "_id": "12",
+        "_name": "Fernanda",
+        "_photo": "👩‍🎤",
+        "_email": "email12@gmail.com",
+        "_password": "Oi",
+        "_status": true,
+        "_friends": [],
+        "_posts": []
+      }
+    ],
+    "_posts": [
+      {
+        "_id": "10",
+        "_content": "Post 10",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "11",
+        "_content": "Post 11",
+        "_date": "2025-02-09T02:33:38.793Z"
+      },
+      {
+        "_id": "12",
+        "_content": "Post 12",
+        "_date": "2025-02-09T02:33:38.793Z"
+      }
+    ]
+  }
+]
