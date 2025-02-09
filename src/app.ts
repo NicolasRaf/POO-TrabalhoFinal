@@ -24,11 +24,19 @@ export class App {
             { name: "Listar todos os perfis", category: Categories.Princ, action: () => this._socialMedia.listProfiles() },
             { name: "Listar perfis com nome 'José'", category: Categories.Princ, action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
             { name: "Listar todos os posts", category: Categories.Princ, action: () => this._socialMedia.listPosts() },
-            { name: "Listar amigos", category: Categories.Princ, action: () => console.log(this._socialMedia.searchProfile("5")[0].friends)},
             { name: "Cadastro", category: Categories.Aut, action: () => this.register() },
             { name: "Login", category: Categories.Aut, action: () => this.login() },
             { name: "Carregar dados", category: Categories.Princ, action: () => this.loadData() },
             { name: "Salvar dados", category: Categories.Princ, action: () => this.saveData() },
+            { name: "Pesquisar Perfil", category: Categories.Princ, action: () => this._socialMedia.searchProfile(input("Digite o nome do perfil: ")) },
+            { name: "Amizades", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Friendly) },
+            { name: "Enviar Solicitacao", category: Categories.Friendly, action: () => this._socialMedia.sendFriendRequest(this._currentUser!.name, promptInput("Digite o nome da conta paezao: ", "Conta não encontrada")) },
+            { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this._socialMedia.acceptFriendRequest(this._currentUser!.name, promptInput("Digite o nome da conta paezao: ", "Conta não encontrada")) },
+            { name: "Postar", category: Categories.Post, action: () => this._socialMedia.addPost(this._currentUser!) },
+            { name: "Listar Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser!) },
+            { name: "Listar Posts de Amigos", category: Categories.Post, action: () => this._socialMedia.listFriendsPosts(this._currentUser!) },
+            { name: "Deletar Post", category: Categories.Post, action: () => this._socialMedia.deletePost(this._currentUser!) },
+            { name: "Deletar Conta", category: Categories.Princ, action: () => this._socialMedia.deleteProfile(this._currentUser!) },
         ];
 
         actions.forEach(({ name, category, action }) => {
