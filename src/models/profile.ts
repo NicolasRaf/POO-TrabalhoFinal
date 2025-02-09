@@ -11,8 +11,9 @@ export class Profile {
   private _status: boolean;
   private _posts: Post[];
   public friends: Profile[];
+  public friendRequests: Profile[];
 
-  constructor(id: string, name: string, photo: string, email: string, password: string, status: boolean, friends: Profile[], posts: Post[]) {
+  constructor(id: string, name: string, photo: string, email: string, password: string, status: boolean, friends: Profile[], posts: Post[], friendRequests: Profile[]) {
     this._id = id;
     this._name = name;
     this._photo = photo;
@@ -21,6 +22,7 @@ export class Profile {
     this._status = status;
     this.friends = friends;
     this._posts = posts;
+    this.friendRequests = friendRequests;
   }
 
   public get email() {
