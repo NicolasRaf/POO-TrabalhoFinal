@@ -1,7 +1,4 @@
 import readline from "readline";
-import { ApplicationError } from "../errs";
-import { ItemMenu } from "./item_menu";
-import { pressEnter } from "../utils/io";
 import { ActionDispatcher } from "./actions_dispatcher";
 
 export class Menu {
@@ -37,7 +34,7 @@ export class Menu {
         this.showItems();
         this.listenKeys();
     }
-
+    
     private listenKeys(): void {
         process.stdin.on("keypress", (_, key) => {
             if (!this._running) return;

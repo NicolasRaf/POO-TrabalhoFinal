@@ -1,6 +1,5 @@
 import { ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
-import { ActionDispatcher } from "./interface/actions_dispatcher";
-import { Menu } from "./interface/menu";
+import { Menu, ActionDispatcher } from "./interface";
 import { SocialMedia, Profile } from "./models";
 import { input, DataReader, DataSaver } from "./utils";
 
