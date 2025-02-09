@@ -54,9 +54,24 @@ export class App {
     }
 
     public register(): void {
-        const username: string = input("Nome de usuario: ");
-        const email: string = input("Email: ");
-        const password: string = input("Senha: ");
+        let username: string;
+        do {
+            username = input("Nome de usuário: ").trim();
+            if (!username) console.log("O nome de usuário não pode estar vazio. Tente novamente.");
+        } while (!username);
+
+        let email: string;
+        do {
+            email = input("Email: ").trim();
+            if (!email) console.log("O email não pode estar vazio. Tente novamente.");
+        } while (!email);
+
+        let password: string;
+        do {
+            password = input("Senha: ").trim();
+            if (!password) console.log("A senha não pode estar vazia. Tente novamente.");
+        } while (!password);
+
         const status: boolean = true;
         const friends: Profile[] = [];
         const posts: Post[] = [];
@@ -117,47 +132,53 @@ export class App {
     }
 
     public loadData(): void {
+        // Se já existem perfis ou posts carregados, não carregue novamente
         if (this._socialMedia.profiles.length > 0 || this._socialMedia.posts.length > 0) {
-            throw new AlreadyExistsError("Dados ja carregados.");
+            throw new AlreadyExistsError("Dados já carregados.");
         }
-
+    
+        // Carregar perfis
         const profilesData: any[] = DataReader.readProfiles();
         const profilesMap: Map<string, Profile> = new Map();
     
-        const profiles: Profile[] = profilesData.map((profile) => {
+        profilesData.forEach(profileData => {
             const newProfile = new Profile(
-                profile._id,
-                profile._name,
-                profile._photo,
-                profile._email,
-                profile._password,
-                profile._status,
+                profileData._id,
+                profileData._name,
+                profileData._photo,
+                profileData._email,
+                profileData._password,
+                profileData._status,
                 [],
                 []
             );
             profilesMap.set(newProfile.id, newProfile);
-            return newProfile;
+            this._socialMedia.addProfile(newProfile); // Adicionar cada perfil individualmente
         });
     
-        profilesData.forEach((profileData) => {
+        // Associar amigos aos perfis
+        profilesData.forEach(profileData => {
             const profile = profilesMap.get(profileData._id);
             if (profile && profileData._friends) {
-                profile.friends = profileData._friends.map((friend: Profile) => profilesMap.get(friend.id)).filter((friend: Profile) => friend !== undefined);
+                profile.friends = profileData._friends
+                    .map((friendId: string) => profilesMap.get(friendId))
+                    .filter((friend: Profile | undefined) => friend !== undefined) as Profile[];
             }
         });
     
-        this._socialMedia.profiles = profiles;
-    
+        // Carregar posts
         const postsData: any[] = DataReader.readPosts();
-        const posts: Post[] = postsData.map((post) => {
-            const profile = post._profile && post._profile._id ? this._socialMedia.searchProfile(post._profile._id)[0] : undefined;
-            return new Post(
-                post._id,
-                post._content,
-                post._date,
-                profile
-            );
+        postsData.forEach(postData => {
+            // Encontra o perfil que fez o post
+            const profile = profilesMap.get(postData._profileId);
+            if (!profile) {
+                console.warn(`Perfil não encontrado para o post com ID ${postData._id}`);
+                return; // Ignorar posts sem perfil válido
+            }
+            const newPost = new Post(postData._id, postData._content, postData._date, profile);
+            this._socialMedia.addPost(newPost); // Adicionar cada post individualmente
         });
-        this._socialMedia.posts = posts;
+    
+        console.log("Dados carregados com sucesso!");
     }
 }
