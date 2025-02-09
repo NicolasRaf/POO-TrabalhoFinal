@@ -1,3 +1,5 @@
+import { NotFoundError } from "../errs";
+
 export class ActionDispatcher {
     private static actions = new Map<string, { category: string, action: () => void }>();
 
@@ -6,11 +8,10 @@ export class ActionDispatcher {
     }
 
     public static executeAction(name: string): void {
-        if (this.actions.has(name)) {
-            this.actions.get(name)!.action(); // Executa a função armazenada
-        } else {
-            console.log(`Ação "${name}" não encontrada.`);
+        if (!this.actions.has(name)) {
+            throw new NotFoundError("Ação nao encontrada.");
         }
+        this.actions.get(name)!.action(); 
     }
 
     public static listActions(category?: string): string[] {

@@ -1,5 +1,6 @@
 import readline from "readline";
 import { ActionDispatcher } from "./actions_dispatcher";
+import { ApplicationError } from "../errs";
 
 export class Menu {
     private _items: string[] = [];
@@ -10,6 +11,12 @@ export class Menu {
     constructor(category: string) {
         this._currentCategory = category;
         this._items = ActionDispatcher.listActions(category);
+    }
+
+    public selectCategory(category: string): void {
+        this._currentCategory = category;
+        this._items = ActionDispatcher.listActions(category);
+        this.start();
     }
 
     private showItems(): void {
@@ -50,7 +57,8 @@ export class Menu {
                 process.stdin.removeAllListeners("keypress");
 
                 const actionName = this._items[this._selectedIndex];
-                ActionDispatcher.executeAction(actionName); // Executa a ação correspondente
+            
+                ActionDispatcher.executeAction(actionName); 
 
                 console.log("Pressione Enter para voltar ao menu.");
                 process.stdin.once("data", () => this.start());

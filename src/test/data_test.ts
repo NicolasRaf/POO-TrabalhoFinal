@@ -1,12 +1,39 @@
-
 import { ApplicationError } from "../errs";
 import { Post, SocialMedia, Profile } from "../models";
 import { DataReader, DataSaver } from "../utils";
 
-
 function main() {
     console.clear();
     const socialMedia = new SocialMedia();
+    // Arrays de amigos com nomes diferentes
+    let friends1 = [
+        new Profile("5", "Miguel", "😎", "email5@gmail.com", "Olá", true, [], []),
+        new Profile("6", "Ana", "🌟", "email6@gmail.com", "Olá", true, [], []),
+    ];
+    socialMedia.addProfile(friends1[0]);
+    socialMedia.addProfile(friends1[1]);
+
+    let friends2 = [
+        new Profile("7", "Pedro", "🕵️‍♂️", "email7@gmail.com", "Oi", true, [], []),
+        new Profile("8", "Laura", "👩‍🚀", "email8@gmail.com", "Oi", true, [], []),
+    ];
+    socialMedia.addProfile(friends2[0]);
+    socialMedia.addProfile(friends2[1]);
+
+    let friends3 = [
+        new Profile("9", "Carlos", "🎨", "email9@gmail.com", "Olá", true, [], []),
+        new Profile("10", "Mariana", "👩‍🍳", "email10@gmail.com", "Olá", true, [], []),
+    ];
+    socialMedia.addProfile(friends3[0]);
+    socialMedia.addProfile(friends3[1]);
+
+
+    let friends4 = [
+        new Profile("11", "Lucas", "🤹‍♂️", "email11@gmail.com", "Oi", true, [], []),
+        new Profile("12", "Fernanda", "👩‍🎤", "email12@gmail.com", "Oi", true, [], []),
+    ];
+    socialMedia.addProfile(friends4[0]);
+    socialMedia.addProfile(friends4[1]);
 
     let posts1 = [
         new Post("1", "Post 1", new Date(), socialMedia.profiles[0]),
@@ -47,38 +74,6 @@ function main() {
     socialMedia.addPost(posts4[1]);
     socialMedia.addPost(posts4[2]);
 
-
-    // Arrays de amigos com nomes diferentes
-    let friends1 = [
-        new Profile("5", "Miguel", "😎", "email5@gmail.com", "Olá", true, [], []),
-        new Profile("6", "Ana", "🌟", "email6@gmail.com", "Olá", true, [], []),
-    ];
-    socialMedia.addProfile(friends1[0]);
-    socialMedia.addProfile(friends1[1]);
-
-    let friends2 = [
-        new Profile("7", "Pedro", "🕵️‍♂️", "email7@gmail.com", "Oi", true, [], []),
-        new Profile("8", "Laura", "👩‍🚀", "email8@gmail.com", "Oi", true, [], []),
-    ];
-    socialMedia.addProfile(friends2[0]);
-    socialMedia.addProfile(friends2[1]);
-
-    let friends3 = [
-        new Profile("9", "Carlos", "🎨", "email9@gmail.com", "Olá", true, [], []),
-        new Profile("10", "Mariana", "👩‍🍳", "email10@gmail.com", "Olá", true, [], []),
-    ];
-    socialMedia.addProfile(friends3[0]);
-    socialMedia.addProfile(friends3[1]);
-
-
-    let friends4 = [
-        new Profile("11", "Lucas", "🤹‍♂️", "email11@gmail.com", "Oi", true, [], []),
-        new Profile("12", "Fernanda", "👩‍🎤", "email12@gmail.com", "Oi", true, [], []),
-    ];
-    socialMedia.addProfile(friends4[0]);
-    socialMedia.addProfile(friends4[1]);
-
-
     socialMedia.addProfile(new Profile("1", "José", "👺", "email@gmail.com", "pass1", true, friends1, posts1));
     socialMedia.addProfile(new Profile("2", "João", "💩", "email2@gmail.com", "pass2",true, friends2, posts2));
     socialMedia.addProfile(new Profile("3", "Maria", "👽", "email3@gmail.com","pass3", true, friends3, posts3));
@@ -95,6 +90,8 @@ function main() {
     // }
 
     DataSaver.saveProfiles(socialMedia.profiles);
+    DataSaver.savePosts(socialMedia.posts);
+
     const newSocialMedia = new SocialMedia();
 
     DataReader.readProfiles().forEach(profile => {
