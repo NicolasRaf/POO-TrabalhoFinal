@@ -92,11 +92,10 @@ export class SocialMedia {
         profile.status = !profile.status;
     }
 
-    public sendFriendRequest(profileIndetifier: string, friendIdentifier: string): void {
-        const profile: Profile = this.searchProfile(profileIndetifier)[0];
+    public sendFriendRequest(actualProfile : Profile, friendIdentifier: string): void {
         const friend: Profile = this.searchProfile(friendIdentifier)[0];
 
-        this._friendRequests.set(profile, friend);
+        this._friendRequests.set(actualProfile, friend);
     }
 
     public acceptFriendRequest(profileIdentifier: string, friendIdentifier: string): void {

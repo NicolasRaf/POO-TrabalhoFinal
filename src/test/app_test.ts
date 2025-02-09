@@ -7,11 +7,12 @@ import { input, DataReader, DataSaver, pressEnter, promptInput, inputEmail} from
 
 export class App {
     private _socialMedia: SocialMedia;
-    private _currentUser?: Profile;
+    private _currentUser : Profile | undefined;
     private _menu: Menu;
 
     constructor() {
         this._socialMedia = new SocialMedia();
+        this._currentUser = undefined;
         this._registerActions(); 
         this._menu = new Menu(Categories.Aut);
 
@@ -20,56 +21,26 @@ export class App {
     }
 
     private _registerActions(): void {
-        const princActions = [
-            // Gerenciamento de Perfis
-            { name: "Buscar perfil", action: () => this.searchProfile() },
-            { name: "Adicionar perfil", action: () => this.addProfile() },
-            { name: "Listar todos os perfis", action: () => this._socialMedia.listProfiles() },
-            { name: "Listar perfis com nome 'José'", action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
-            { name: "Ativar/Desativar perfil", action: () => this.toggleProfileStatus() },
-    
-            // Gerenciamento de Publicações
-            { name: "Adicionar publicação", action: () => this.addPost() },
-            { name: "Adicionar publicação avançada", action: () => this.addAdvancedPost() },
-            { name: "Listar publicações", action: () => this.listPosts() },
-            { name: "Listar publicações por perfil", action: () => this.listPostsByProfile() },
-    
-            // Gerenciamento de Solicitações
-            { name: "Enviar solicitação de amizade", action: () => this.sendFriendRequest() },
+        const actions = [
+            { name: "Buscar perfil", action: () => this._socialMedia.searchProfile(promptInput("Informe alguns dos dados(email/name/id): ", "Usuário não encontrado")) },
+            { name: "Listar perfis", action: () => this._socialMedia.listProfiles() },
+            { name: "Adicionar publicação", action: () => this._socialMedia.addPost(Post.createPost(this._currentUser))},
+            { name: "Listar publicações", action: () => this._socialMedia.listPosts() },
+            { name: "Enviar solicitação de amizade", action: () => this._socialMedia.sendFriendRequest(this._currentUser, searchProfile(promptInput("Informe alguns dos dados(email/name/id): ", "Usuário não encontrado"))), },
             { name: "Aceitar solicitação de amizade", action: () => this.acceptFriendRequest() },
             { name: "Recusar solicitação de amizade", action: () => this.rejectFriendRequest() },
-    
-            // Gerenciamento de Interações
-            { name: "Adicionar interação em publicação", action: () => this.addInteraction() },
-    
-            // Administração e Dados
+            { name: "Interagir com publicação", action: () => this.addInteraction() },
             { name: "Carregar dados", action: () => this.loadData() }
         ];
-    
-        // Registra todas as ações na categoria Princ
-        princActions.forEach(({ name, action }) => {
+        
+        actions.forEach(({ name, action }) => {
             ActionDispatcher.registerAction(name, Categories.Princ, action);
-        });
-    
-        // Adiciona as mesmas ações na categoria PrincAdm + ações exclusivas para admins
-        const adminActions = [
-            ...princActions, // 🔥 Copia todas as ações de Princ
-            { name: "Gerenciar permissões de usuários", action: () => this.managePermissions() }
-        ];
-    
-        adminActions.forEach(({ name, action }) => {
             ActionDispatcher.registerAction(name, Categories.PrincAdm, action);
         });
-    
-        // Ações de autenticação (mantidas separadas)
-        const authActions = [
-            { name: "Cadastro", category: Categories.Aut, action: () => this.register() },
-            { name: "Login", category: Categories.Aut, action: () => this.login() }
-        ];
-    
-        authActions.forEach(({ name, category, action }) => {
-            ActionDispatcher.registerAction(name, category, action);
-        });
+        
+        ActionDispatcher.registerAction("Gerenciar permissões de usuários", Categories.PrincAdm, () => ());
+        ActionDispatcher.registerAction("Cadastro", Categories.Aut, () => this.register());
+        ActionDispatcher.registerAction("Login", Categories.Aut, () => this.login());
     }
     
 
@@ -124,6 +95,7 @@ export class App {
         }
     }
     
+
     private isEmailRegistered(email: string): boolean {
         try {
             this._socialMedia.searchProfile(email)[0];
@@ -166,8 +138,9 @@ export class App {
     }
 
     public saveData(): void {
-        DataSaver.saveProfiles(this._socialMedia.profiles);
-        DataSaver.savePosts(this._socialMedia.posts);
+        console.warn("Salvando dados...");
+        DataSaver.saveData(this._socialMedia.profiles);
+        DataSaver.saveData(this._socialMedia.posts);
     }
 
     public loadData(): void {
@@ -177,7 +150,7 @@ export class App {
         }
     
         // Carregar perfis
-        const profilesData: any[] = DataReader.readProfiles();
+        const profilesData: any[] = DataReader.readData("profiles");
         const profilesMap: Map<string, Profile> = new Map();
     
         profilesData.forEach(profileData => {
@@ -206,18 +179,17 @@ export class App {
         });
     
         // Carregar posts
-        const postsData: any[] = DataReader.readPosts();
-        postsData.forEach(postData => {
-            // Encontra o perfil que fez o post
-            const profile = profilesMap.get(postData._profileId);
-            if (!profile) {
-                console.warn(`Perfil não encontrado para o post com ID ${postData._id}`);
-                return; // Ignorar posts sem perfil válido
-            }
-            const newPost = new Post(postData._id, postData._content, postData._date, profile);
-            this._socialMedia.addPost(newPost); // Adicionar cada post individualmente
+        const postsData: any[] = DataReader.readData("posts").reverse();
+        const posts: Post[] = postsData.map((post) => {
+            const profile = post._profile && post._profile._id ? 
+            this._socialMedia.searchProfile(post._profile._id)[0] : undefined;
+            return new Post(
+                post._id,
+                post._content,
+                post._date,
+                profile
+            );
         });
-    
-        console.log("Dados carregados com sucesso!");
+        this._socialMedia.posts = posts;
     }
 }
