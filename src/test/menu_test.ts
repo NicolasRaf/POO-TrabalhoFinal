@@ -1,4 +1,4 @@
-import { Menu } from "../interface/menu";
+// import { Menu } from "../interface/menu";
 
-const menu = new Menu([]);;
-menu.start();
+// const menu = new Menu([]);;
+// menu.start();

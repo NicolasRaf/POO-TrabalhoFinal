@@ -22,9 +22,11 @@
   "homepage": "https://github.com/NicolasRaf/POO-TrabalhoFinal#readme",
   "dependencies": {
     "fs": "^0.0.1-security",
+    "readline": "^1.3.0",
     "readline-sync": "^1.4.10"
   },
   "devDependencies": {
+    "@types/node": "^22.13.1",
     "@types/readline-sync": "^1.4.8"
   }
 }
