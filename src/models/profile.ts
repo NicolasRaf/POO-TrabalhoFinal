@@ -24,7 +24,7 @@ export class Profile {
     this._posts = posts;
   }
 
-  get email() {
+  public get email() {
     return this._email;
   }
 
