@@ -3,36 +3,28 @@ import { AlreadyExistsError, NotFoundError } from "../errs";
 import { Interaction, Profile, AdvancedProfile, Post, AdvancedPost } from "./"
 
 export class SocialMedia {
-    private _profiles: Profile[];
-    private _posts: Post[];
+    public profiles: Profile[];
+    public posts: Post[];
     private _friendRequests: Map<Profile, Profile>;
 
     constructor() {
-        this._profiles = [];
-        this._posts = [];
+        this.profiles = [];
+        this.posts = [];
         this._friendRequests = new Map();
     }
-
-    get profiles(): Profile[] {
-        return this._profiles;
-    }
-
-    get posts(): Post[] {
-        return this._posts;
-    }
-
+   
     public addProfile(profile: Profile) {
-        if (this._profiles.includes(profile)) {
+        if (this.profiles.includes(profile)) {
             throw new AlreadyExistsError("Perfil ja cadastrado.");
         }
-        this._profiles.push(profile);
+        this.profiles.push(profile);
     }
 
     public addPost(post: Post) {
-        if (this._posts.includes(post)) {
+        if (this.posts.includes(post)) {
             throw new AlreadyExistsError("Post ja cadastrado.");
         }
-        this._posts.push(post);
+        this.posts.push(post);
     }
 
     public searchProfile(identifier: string): Profile[] {
@@ -40,9 +32,9 @@ export class SocialMedia {
         const profileType = identifier.includes("@") ? "email" : isNaN(Number(identifier)) ? "name" : "id";
         
         const profileSearchMap: Record<string, (id: string) => Profile[]> = {
-            "email": (id: string) => this._profiles.filter(profile => profile.email === id),
-            "name": (id: string) => this._profiles.filter(profile => profile.name === id),
-            "id": (id: string) => this._profiles.filter(profile => profile.id === id)
+            "email": (id: string) => this.profiles.filter(profile => profile.email === id),
+            "name": (id: string) => this.profiles.filter(profile => profile.name === id),
+            "id": (id: string) => this.profiles.filter(profile => profile.id === id)
         };
         profiles = profileSearchMap[profileType](identifier);
     
@@ -54,7 +46,7 @@ export class SocialMedia {
     }   
 
     public searchPost(id: string): Post {
-        const post: Post | undefined = this._posts.find(post => post.id === id);
+        const post: Post | undefined = this.posts.find(post => post.id === id);
         
         if (!post) {
             throw new NotFoundError("Post nao encontrado.");
@@ -63,8 +55,8 @@ export class SocialMedia {
         return post;
     }
     
-    public listProfiles(profiles: Profile[] = this._profiles): Profile[] {
-        if (this._profiles.length === 0) {
+    public listProfiles(profiles: Profile[] = this.profiles): Profile[] {
+        if (this.profiles.length === 0) {
             throw new NotFoundError("Nenhum perfil cadastrado.");
         }
         
@@ -76,11 +68,11 @@ export class SocialMedia {
             console.log("=".repeat(30));
         };  
 
-        return this._profiles;
+        return this.profiles;
     }
 
-    public listPosts(posts: Post[] = this._posts): Post[] {
-        if (this._posts.length === 0) {
+    public listPosts(posts: Post[] = this.posts): Post[] {
+        if (this.posts.length === 0) {
             throw new NotFoundError("Nenhum post cadastrado.");
         }
 
@@ -92,7 +84,7 @@ export class SocialMedia {
             console.log("=".repeat(30));
         };  
 
-        return this._posts;
+        return this.posts;
     }
 
     public switchProfileStatus(identifier: string): void {
@@ -134,7 +126,7 @@ export class SocialMedia {
 
     public interactPost(profileIdentifier: string, postIdentifier: string): void {
         const profile: Profile = this.searchProfile(profileIdentifier)[0];  
-        const post: Post = this._posts.filter(post => post.id === postIdentifier)[0];    
+        const post: Post = this.posts.filter(post => post.id === postIdentifier)[0];    
         
         if (profile.status && post instanceof AdvancedPost) {
             post.addInteraction(new Interaction( InteractionType.curtir, profile));

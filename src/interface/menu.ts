@@ -57,8 +57,12 @@ export class Menu {
                 process.stdin.removeAllListeners("keypress");
 
                 const actionName = this._items[this._selectedIndex];
-            
-                ActionDispatcher.executeAction(actionName); 
+                
+                try {
+                    ActionDispatcher.executeAction(actionName); 
+                } catch (err) {
+                    console.log((err as ApplicationError).message);
+                }
 
                 console.log("Pressione Enter para voltar ao menu.");
                 process.stdin.once("data", () => this.start());

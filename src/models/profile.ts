@@ -1,7 +1,6 @@
 import { Post } from "./post";
 import { AlreadyExistsError, NotFoundError } from "../errs";
 
-
 export class Profile {
   private _id: string;
   private _name: string;
@@ -9,8 +8,8 @@ export class Profile {
   private _email: string;
   private _password: string;
   private _status: boolean;
-  private _friends: Profile[];
   private _posts: Post[];
+  public friends: Profile[];
 
   constructor(id: string, name: string, photo: string, email: string, password: string, status: boolean, friends: Profile[], posts: Post[]) {
     this._id = id;
@@ -19,7 +18,7 @@ export class Profile {
     this._email = email;
     this._password = password;
     this._status = status;
-    this._friends = friends;
+    this.friends = friends;
     this._posts = posts;
   }
 
@@ -43,10 +42,6 @@ export class Profile {
     return this._photo;
   }
 
-  get friends() {
-    return this._friends;
-  }
-
   get posts() {
     return this._posts;
   }
@@ -56,18 +51,18 @@ export class Profile {
   }
 
   public addFriend(friend: Profile) {
-    if (this._friends.includes(friend)) {
+    if (this.friends.includes(friend)) {
       throw new AlreadyExistsError("Amigo já adicionado.");
     }
-    this._friends.push(friend);
+    this.friends.push(friend);
   }
 
   private removeFriend(friend: Profile) {
-    const index = this._friends.indexOf(friend);
+    const index = this.friends.indexOf(friend);
     if (index === -1) {
       throw new NotFoundError("Amigo não encontrado.");
     }
-    this._friends.splice(index, 1);
+    this.friends.splice(index, 1);
   }
 
   private addPost(post: Post) {
