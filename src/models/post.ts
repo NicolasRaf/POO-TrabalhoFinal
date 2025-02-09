@@ -28,7 +28,9 @@ export class Post {
         return this._profile;
     }
 
-    public showContent() { 
-        console.log(this._content); 
+    public showPost() { 
+        console.log(`Contéudo: ${this._content}`);
+        console.log(`Data: ${this._date.toLocaleString().split("T")[0]}`);   
+        console.log(`Perfil: ${this._profile?.name}`);
     }
 }

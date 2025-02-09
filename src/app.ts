@@ -1,5 +1,5 @@
 import { Categories } from "./enum/categories";
-import { ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
+import { AlreadyExistsError, ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
 import { Menu, ActionDispatcher } from "./interface";
 import { SocialMedia, Profile, Post } from "./models";
 import { input, DataReader, DataSaver, pressEnter } from "./utils";
@@ -12,7 +12,7 @@ export class App {
 	constructor() {
 		this._socialMedia = new SocialMedia();
 		this._registerActions();
-		this._menu = new Menu(Categories.Aut);
+		this._menu = new Menu(Categories.Princ);
 
 		console.log("Iniciando o app...");
 	}
@@ -78,46 +78,48 @@ export class App {
 	}
 
 	public loadData(): void {
-		const profilesData: Profile[] = DataReader.readProfiles();
+		if (this._socialMedia.profiles.length > 0 || this._socialMedia.posts.length > 0) {
+			throw new AlreadyExistsError("Dados ja carregados.");
+		}
+
+		const profilesData: any[] = DataReader.readProfiles();
 		const profilesMap: Map<string, Profile> = new Map();
-
-		const profiles: Profile[] = 
-		profilesData.map((profile) => 
-		{
+	
+		const profiles: Profile[] = profilesData.map((profile) => {
 			const newProfile = new Profile(
-			profile.id,
-			profile.name,
-			profile.photo,
-			profile.email,
-			profile.password,
-			profile.status,
-			[],
-			[]
+				profile._id,
+				profile._name,
+				profile._photo,
+				profile._email,
+				profile._password,
+				profile._status,
+				[],
+				[]
 			);
-
 			profilesMap.set(newProfile.id, newProfile);
 			return newProfile;
 		});
-
+	
+		
 		profilesData.forEach((profileData) => {
-			const profile = profilesMap.get(profileData.id);
-			if (profile !== undefined && profileData.friends !== undefined) {
-				profile.friends = profileData.friends.map((friend) => profilesMap.get(friend.id)).filter((friend) => friend !== undefined);
+			const profile = profilesMap.get(profileData._id);
+			if (profile && profileData._friends) {
+				profile.friends = profileData._friends.map((friend: Profile) => profilesMap.get(friend.id)).filter((friend: Profile) => friend !== undefined);
 			}
 		});
+	
 		this._socialMedia.profiles = profiles;
-
-		const postsData: Post[] = DataReader.readPosts();
-    	const posts: Post[] = postsData.map((post) => {
-        const profile: Profile | undefined = (post.profile && post.profile.id) ? 
-		this._socialMedia.searchProfile(post.profile.id)[0] : undefined;
-        return new Post(
-            post.id,
-            post.content,
-            post.date,
-            profile
-        );
-    });
-    this._socialMedia.posts = posts;
+	
+		const postsData: any[] = DataReader.readPosts();
+		const posts: Post[] = postsData.map((post) => {
+			const profile = post._profile && post._profile._id ? this._socialMedia.searchProfile(post._profile._id)[0] : undefined;
+			return new Post(
+				post._id,
+				post._content,
+				post._date,
+				profile
+			);
+		});
+		this._socialMedia.posts = posts;
 	}
 }

@@ -61,10 +61,10 @@ export class Menu {
                 try {
                     ActionDispatcher.executeAction(actionName); 
                 } catch (err) {
-                    console.log((err as ApplicationError).message);
+                    console.error((err as ApplicationError).message);   
                 }
 
-                console.log("Pressione Enter para voltar ao menu.");
+                console.log("\nPressione Enter para voltar ao menu.");
                 process.stdin.once("data", () => this.start());
 
                 return;
