@@ -1,9 +1,9 @@
-import { App } from "./app_test";
+// import { App } from "./app_test";
 
 
-function main() {
-    const app = new App();
-    app.run();
-}
+// function main() {
+//     const app = new App();
+//     app.run();
+// }
 
-main();
+// main();

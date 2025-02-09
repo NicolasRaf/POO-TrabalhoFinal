@@ -1,18 +1,23 @@
-import { writeFileSync } from "fs"
-import { Post, Profile } from "../models";
-import { join } from "path";
-
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 export class DataSaver {
-    public static saveData(data: Profile[] | Post[]): void {
+    public static saveData(fileName: string, data: any): void {
+        const filePath = join(__dirname, '..', "..", "src", 'data', `${fileName}.json`);
+
         try {
-            const dataToSave = JSON.stringify(data, null, 2);
-            const fileName: string = data[0] instanceof Profile ? "profiles.json" : "posts.json";
-            const filePath: string = join(__dirname, '..', '..', 'src', 'data', fileName);
-            writeFileSync(filePath, dataToSave);
-    } catch (error) {
-            console.error("Error saving data:", error);
+            writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+            console.log(`Dados salvos com sucesso em ${fileName}.json`);
+        } catch (error) {
+            console.error(`Erro ao salvar os dados em ${fileName}.json:`, error);
         }
     }
 
+    public static saveProfiles(profiles: any[]): void {
+        this.saveData('profiles', profiles);
+    }
+
+    public static savePosts(posts: any[]): void {
+        this.saveData('posts', posts);
+    }
 }
