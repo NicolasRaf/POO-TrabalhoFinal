@@ -89,8 +89,8 @@ function main() {
     //     console.log(i);
     // }
 
-    DataSaver.saveData(socialMedia.profiles);
-    DataSaver.saveData(socialMedia.posts);
+    DataSaver.saveProfiles(socialMedia.profiles);
+    //DataSaver.savePosts(socialMedia.posts);
 
     // const newSocialMedia = new SocialMedia();
 

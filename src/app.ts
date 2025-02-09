@@ -24,6 +24,7 @@ export class App {
             { name: "Listar todos os perfis", category: Categories.Princ, action: () => this._socialMedia.listProfiles() },
             { name: "Listar perfis com nome 'José'", category: Categories.Princ, action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
             { name: "Listar todos os posts", category: Categories.Princ, action: () => this._socialMedia.listPosts() },
+            { name: "Listar amigos", category: Categories.Princ, action: () => console.log(this._socialMedia.searchProfile("5")[0].friends)},
             { name: "Cadastro", category: Categories.Aut, action: () => this.register() },
             { name: "Login", category: Categories.Aut, action: () => this.login() },
             { name: "Carregar dados", category: Categories.Princ, action: () => this.loadData() },
@@ -121,63 +122,98 @@ export class App {
         while (this._socialMedia.profiles.some(profile => profile.id === id)) {
             id = Math.floor(Math.random() * 1000).toString();
         }
-
         return id;
     }
 
     public saveData(): void {
-        console.warn("Salvando dados...");
-        DataSaver.saveData(this._socialMedia.profiles);
-        DataSaver.saveData(this._socialMedia.posts);
+        const profiles = this._socialMedia.profiles.map(profile => ({
+            _id: profile.id,
+            _name: profile.name,
+            _photo: profile.photo,
+            _email: profile.email,
+            _password: profile.password,
+            _status: profile.status,
+            friends: profile.friends.map(friend => ({
+                _id: friend.id,
+                _name: friend.name,
+                _photo: friend.photo,
+                _email: friend.email,
+                _password: friend.password,
+                _status: friend.status
+            })), // Salva os detalhes dos amigos
+            _posts: profile.posts.map(post => post.id) // Salva apenas os IDs dos posts
+        }));
+    
+        const posts = this._socialMedia.posts.map(post => ({
+            _id: post.id,
+            _content: post.content,
+            _date: post.date,
+            _profile: post.profile?.id // Salva apenas o ID do perfil
+        }));
+    
+        DataSaver.saveProfiles(profiles);
+        DataSaver.savePosts(posts);
     }
-
+    
     public loadData(): void {
-        // Se já existem perfis ou posts carregados, não carregue novamente
         if (this._socialMedia.profiles.length > 0 || this._socialMedia.posts.length > 0) {
             throw new AlreadyExistsError("Dados já carregados.");
         }
-    
-        // Carregar perfis
+
         const profilesData: any[] = DataReader.readData("profiles");
         const profilesMap: Map<string, Profile> = new Map();
     
-        profilesData.forEach(profileData => {
+        // Cria perfis sem amigos
+        const profiles: Profile[] = profilesData.map((profile) => {
             const newProfile = new Profile(
-                profileData._id,
-                profileData._name,
-                profileData._photo,
-                profileData._email,
-                profileData._password,
-                profileData._status,
+                profile._id,
+                profile._name,
+                profile._photo,
+                profile._email,
+                profile._password,
+                profile._status,
                 [],
                 []
             );
             profilesMap.set(newProfile.id, newProfile);
-            this._socialMedia.addProfile(newProfile); // Adicionar cada perfil individualmente
+            return newProfile;
         });
     
-        // Associar amigos aos perfis
-        profilesData.forEach(profileData => {
+        // Associa os amigos aos perfis
+        profilesData.forEach((profileData) => {
             const profile = profilesMap.get(profileData._id);
-            if (profile && profileData._friends) {
-                profile.friends = profileData._friends
-                    .map((friendId: string) => profilesMap.get(friendId))
-                    .filter((friend: Profile | undefined) => friend !== undefined) as Profile[];
+            if (profile && profileData.friends) {
+                profile.friends = profileData.friends.map((friendData: any) => profilesMap.get(friendData._id)).filter((friend: Profile) => friend !== undefined);
             }
         });
     
-        // Carregar posts
-        const postsData: any[] = DataReader.readData("posts").reverse();
-		const posts: Post[] = postsData.map((post) => {
-			const profile = post._profile && post._profile._id ? 
-            this._socialMedia.searchProfile(post._profile._id)[0] : undefined;
-			return new Post(
-				post._id,
-				post._content,
-				post._date,
-				profile
-			);
-		});
-		this._socialMedia.posts = posts;
-    }
+        this._socialMedia.profiles = profiles;
+    
+        const postsData: any[] = DataReader.readData("posts");
+        const posts: Post[] = postsData.map((post) => {
+            const profileId = post._profile;
+            const profile = profilesMap.get(profileId);
+    
+            if (!profile) {
+                console.warn(`Perfil não encontrado para o post com ID ${post._id}`);
+                return null;
+            }
+    
+            const newPost = new Post(
+                post._id,
+                post._content,
+                post._date,
+                profile
+            );
+    
+            profile.posts.push(newPost); // Adiciona o post à lista de posts do perfil
+    
+            return newPost;
+        }).filter(post => post !== null) as Post[];
+    
+        this._socialMedia.posts = posts;
+    
+        console.log("Dados carregados com sucesso!");
+    }    
+    
 }
