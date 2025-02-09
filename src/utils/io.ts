@@ -23,6 +23,26 @@ export function inputNumber(message: string): number {
  * Used to pause the application at the end of the menu loop.
  * @returns {void}
  */
-export function pressEnter(): void {;
-    input("Press Enter to continue...");;   
+export function pressEnter(): void {
+    input("Press Enter to continue...");
+}
+
+export function promptInput(promptMessage: string, errorMessage: string): string {
+    let inputVal: string;
+    do {
+        inputVal = input(promptMessage).trim();
+        console.log(`DEBUG: username recebido -> "${inputVal}"`); // Adiciona um log para capturar o valor
+        if (!inputVal) console.log(errorMessage);
+    } while (!inputVal);
+    return inputVal;
+}
+
+export function inputEmail(): string {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let email: string;
+    do {
+        email = input("Email: ");
+        if (!emailRegex.test(email)) console.log("Invalid email format. Please enter a valid email address.");
+    } while (!emailRegex.test(email));
+    return email;
 }

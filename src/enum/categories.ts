@@ -1,5 +1,6 @@
 
 export enum Categories {
-    "Aut" = "Autenticação",
-    "Princ" = "Principal"
+    Aut = "Autenticação",
+    Princ = "Principal",
+    Photo = "Selecionar foto de perfil"
 }

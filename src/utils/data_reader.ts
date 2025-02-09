@@ -4,7 +4,7 @@ import { join } from "path";
 export class DataReader {
 
     private static readJsonFile(fileName: string): any[] {
-        const filePath = join(__dirname, '..', 'data', fileName);
+        const filePath = join(__dirname, '..', "..", "src", 'data', fileName);
 
         try {
             const data = readFileSync(filePath, "utf-8");

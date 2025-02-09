@@ -1,9 +1,9 @@
-import { Categories } from "./enum/categories";
+import { Categories, OptionsPhoto } from "./enum";
 import { AlreadyExistsError, ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
 import { Menu, ActionDispatcher } from "./interface";
 import { SocialMedia, Profile, Post } from "./models";
-import { OptionsPhoto } from "./enum/photos";
-import { input, DataReader, DataSaver, pressEnter } from "./utils";
+import { input, DataReader, DataSaver, pressEnter, promptInput, inputEmail} from "./utils";
+
 
 export class App {
     private _socialMedia: SocialMedia;
@@ -15,6 +15,7 @@ export class App {
         this._registerActions(); 
         this._menu = new Menu(Categories.Aut);
 
+		this.loadData();
         console.log("Iniciando o app...");
     }
 
@@ -54,69 +55,67 @@ export class App {
     }
 
     public register(): void {
-        let username: string;
-        do {
-            username = input("Nome de usuário: ").trim();
-            if (!username) console.log("O nome de usuário não pode estar vazio. Tente novamente.");
-        } while (!username);
+		const username = promptInput("Nome de usuário: ", "O nome de usuário não pode estar vazio.");
+		console.log(`DEBUG: username recebido -> "${username}"`);
 
-        let email: string;
-        do {
-            email = input("Email: ").trim();
-            if (!email) console.log("O email não pode estar vazio. Tente novamente.");
-        } while (!email);
-
-        let password: string;
-        do {
-            password = input("Senha: ").trim();
-            if (!password) console.log("A senha não pode estar vazia. Tente novamente.");
-        } while (!password);
-
-        const status: boolean = true;
-        const friends: Profile[] = [];
-        const posts: Post[] = [];
-
-        try {
-            try {
-                let user = this._socialMedia.searchProfile(email)[0];
-                throw new ApplicationError("Email já cadastrado.");
-            } catch (error) {
-                if (error instanceof NotFoundError) {
-                } else {
-                    throw error;
-                }
-            }
-
-            const id = this.gerarId();
-
-            let photo: string | undefined = undefined;
-            while (!photo) { 
-                console.log("Escolha uma foto de perfil:");
-                Object.values(OptionsPhoto).forEach((emoji, index) => {
-                    console.log(`${index + 1}. ${emoji}`);
-                });
-
-                const photoChoice = parseInt(input("Escolha o número da foto: "));
-                if (photoChoice >= 1 && photoChoice <= Object.values(OptionsPhoto).length) {
-                    photo = Object.values(OptionsPhoto)[photoChoice - 1];
-                } else {
-                    console.log("Opção inválida. Tente novamente.");
-                }
-            }
-
-            let user = new Profile(id, username, photo, email, password, status, friends, posts);
-
-            this._socialMedia.addProfile(user);
-
-            console.log("Usuário registrado com sucesso!");
-            pressEnter();
-            this._menu.selectCategory(Categories.Princ);
-        } catch (error) {
-            console.error("Erro ao registrar usuário: " + (error as ApplicationError).message);
-        }
-    }
-
-    public gerarId(): string {
+		const email = inputEmail();
+		const password = promptInput("Senha: ", "A se nha não pode estar vazia.");
+	
+		const status: boolean = true;
+		const friends: Profile[] = [];
+		const posts: Post[] = [];
+	
+		try {
+			if (this.isEmailRegistered(email)) {
+				throw new ApplicationError("Email já cadastrado.");
+			}
+	
+			const id = this.gernerateId();
+			const photo = this.chooseProfilePhoto();
+	
+			const user = new Profile(id, username, photo, email, password, status, friends, posts);
+			this._socialMedia.addProfile(user);
+	
+			console.log("Usuário registrado com sucesso!");
+			pressEnter();
+			this._menu.selectCategory(Categories.Princ);
+		} catch (error) {
+			console.error("Erro ao registrar usuário: " + (error as ApplicationError).message);
+		}
+	}
+	
+	private isEmailRegistered(email: string): boolean {
+		try {
+			this._socialMedia.searchProfile(email)[0];
+			return true;
+		} catch (error) {
+			if (error instanceof NotFoundError) {
+				return false;
+			} else {
+				throw error;
+			}
+		}
+	}
+	
+	private chooseProfilePhoto(): string {
+		let photo: string | undefined = undefined;
+		while (!photo) {
+			console.log("Escolha uma foto de perfil:");
+			Object.values(OptionsPhoto).forEach((emoji, index) => {
+				console.log(`${index + 1}. ${emoji}`);
+			});
+	
+			const photoChoice = parseInt(input("Escolha o número da foto: "));
+			if (photoChoice >= 1 && photoChoice <= Object.values(OptionsPhoto).length) {
+				photo = Object.values(OptionsPhoto)[photoChoice - 1];
+			} else {
+				console.log("Opção inválida. Tente novamente.");
+			}
+		}
+		return photo;
+	}
+	
+    public gernerateId(): string {
         let id = Math.floor(Math.random() * 1000).toString(); 
 
         while (this._socialMedia.profiles.some(profile => profile.id === id)) {
