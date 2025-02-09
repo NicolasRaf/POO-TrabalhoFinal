@@ -1,5 +1,6 @@
 import { Post } from "./post";
 import { AlreadyExistsError, NotFoundError } from "../errs";
+import { InactiveProfileError } from "../errs/inactiveProfileError";
 
 export class Profile {
   private _id: string;
@@ -69,6 +70,11 @@ export class Profile {
     if (this._posts.includes(post)) {
       throw new AlreadyExistsError("Post já existe.");
     }
+
+    if (this.status === false){
+      throw new InactiveProfileError("Perfil inativo: Proibido post.");
+    }
+    
     this._posts.push(post);
   }
 
