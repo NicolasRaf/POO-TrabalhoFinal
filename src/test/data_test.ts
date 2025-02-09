@@ -89,21 +89,21 @@ function main() {
     //     console.log(i);
     // }
 
-    DataSaver.saveProfiles(socialMedia.profiles);
-    DataSaver.savePosts(socialMedia.posts);
+    DataSaver.saveData(socialMedia.profiles);
+    DataSaver.saveData(socialMedia.posts);
 
-    const newSocialMedia = new SocialMedia();
+    // const newSocialMedia = new SocialMedia();
 
-    DataReader.readProfiles().forEach(profile => {
-        newSocialMedia.addProfile(profile);
-    });
+    // DataReader.readProfiles().forEach(profile => {
+    //     newSocialMedia.addProfile(profile);
+    // });
 
-    try {
-        newSocialMedia.listProfiles();
-        newSocialMedia.listPosts();
-    } catch (error) {
-        console.error((error as ApplicationError).message);
-    }
+    // try {
+    //     newSocialMedia.listProfiles();
+    //     newSocialMedia.listPosts();
+    // } catch (error) {
+    //     console.error((error as ApplicationError).message);
+    // }
 }   
 
 main();

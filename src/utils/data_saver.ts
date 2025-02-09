@@ -4,23 +4,15 @@ import { join } from "path";
 
 
 export class DataSaver {
-    public static saveProfiles(data: Profile[]): void {
+    public static saveData(data: Profile[] | Post[]): void {
         try {
             const dataToSave = JSON.stringify(data, null, 2);
-            const filePath: string = join(__dirname, '..', '..', 'src', 'data', 'profiles.json');
+            const fileName: string = data[0] instanceof Profile ? "profiles.json" : "posts.json";
+            const filePath: string = join(__dirname, '..', '..', 'src', 'data', fileName);
             writeFileSync(filePath, dataToSave);
     } catch (error) {
             console.error("Error saving data:", error);
         }
     }
 
-    public static savePosts(data: Post[]): void {
-        try {
-            const dataToSave = JSON.stringify(data, null, 2);
-            const filePath: string = join(__dirname, '..', '..', 'src', 'data', 'profiles.json');
-            writeFileSync(filePath, dataToSave);
-    } catch (error) {
-            console.error((error as Error).message);
-        }
-    }
 }
