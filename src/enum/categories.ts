@@ -5,5 +5,5 @@ export enum Categories {
     Perfil = "Perfil",
     Friendly = "Amizades",
     Post = "Postagens",
-    Search = "Pesquisar",
+    TyPost = "Tipo de Post",
 }

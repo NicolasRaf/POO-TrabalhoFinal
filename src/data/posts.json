@@ -1,74 +1,44 @@
 [
   {
-    "_id": "1",
-    "_content": "Post 1",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "5"
+    "_id": "971",
+    "_content": "post1",
+    "_date": "2025-02-10T14:42:34.843Z",
+    "_profile": "215",
+    "_type": "Adv",
+    "_interaction": [
+      {
+        "_type": "🤣",
+        "_author": "152"
+      },
+      {
+        "_type": "👎",
+        "_author": "23"
+      },
+      {
+        "_type": "😯",
+        "_author": "434"
+      }
+    ]
   },
   {
-    "_id": "2",
-    "_content": "Post 2",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "6"
-  },
-  {
-    "_id": "3",
-    "_content": "Post 3",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "7"
-  },
-  {
-    "_id": "4",
-    "_content": "Post 4",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "5"
-  },
-  {
-    "_id": "5",
-    "_content": "Post 5",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "6"
-  },
-  {
-    "_id": "6",
-    "_content": "Post 6",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "7"
-  },
-  {
-    "_id": "7",
-    "_content": "Post 7",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "5"
-  },
-  {
-    "_id": "8",
-    "_content": "Post 8",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "6"
-  },
-  {
-    "_id": "9",
-    "_content": "Post 9",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "7"
-  },
-  {
-    "_id": "10",
-    "_content": "Post 10",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "5"
-  },
-  {
-    "_id": "11",
-    "_content": "Post 11",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "6"
-  },
-  {
-    "_id": "12",
-    "_content": "Post 12",
-    "_date": "2025-02-09T21:18:39.441Z",
-    "_profile": "7"
+    "_id": "679",
+    "_content": "post2",
+    "_date": "2025-02-10T14:42:42.139Z",
+    "_profile": "215",
+    "_type": "Adv",
+    "_interaction": [
+      {
+        "_type": "😯",
+        "_author": "152"
+      },
+      {
+        "_type": "👍",
+        "_author": "23"
+      },
+      {
+        "_type": "🤣",
+        "_author": "434"
+      }
+    ]
   }
 ]

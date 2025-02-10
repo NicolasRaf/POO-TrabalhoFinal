@@ -4,6 +4,7 @@ export class Post {
     private _content: string;
     private _date: Date;
     private _profile?: Profile;
+    public type: string = "Normal";
 
     constructor(id: string, content: string, date: Date, profile?: Profile) {
         this._id = id;

@@ -1,5 +1,5 @@
 import { InteractionType } from "../enum/interactions";
-import { AlreadyExistsError, NotFoundError } from "../errs";
+import { AlreadyExistsError, ApplicationError, NotFoundError } from "../errs";
 import { Interaction, Profile, AdvancedProfile, Post, AdvancedPost } from "./"
 
 export class SocialMedia {
@@ -91,7 +91,7 @@ export class SocialMedia {
     }
 
     public listPosts(posts: Post[] = this.posts): Post[] {
-        if (this.posts.length === 0) {
+        if (posts.length === 0) {
             throw new NotFoundError("Nenhum post cadastrado.");
         }
 
@@ -103,7 +103,7 @@ export class SocialMedia {
             console.log("=".repeat(30));
         };  
 
-        return this.posts;
+        return posts;
     }
 
     public listFriendsPosts(friends: Profile[]): void {
@@ -183,12 +183,34 @@ export class SocialMedia {
         });
       }
 
-    public interactPost(profileIdentifier: string, postIdentifier: string): void {
+      public interactPost(profileIdentifier: string, postIdentifier: string, interactionKey: string): void {
         const profile: Profile = this.searchProfile(profileIdentifier)[0];  
-        const post: Post = this.posts.find(post => post.id === postIdentifier)!;    
-        
-        if (profile.status && post instanceof AdvancedPost) {
-            post.addInteraction(new Interaction(InteractionType.curtir, profile));
+        const post: Post = this.searchPost(postIdentifier);    
+
+        if (post.profile === profile){
+            throw new ApplicationError("Você não pode interagir com seu próprio post.");
+        }
+
+        if (!(post instanceof AdvancedPost)) {
+            throw new NotFoundError("Perfil ou post não encontrado.");
+        }
+
+        const alreadyInteracted = post.interactions.some(interaction => interaction.author === profile)
+        if  (alreadyInteracted){
+            throw new ApplicationError("Você ja interagiu com este post.")
+        }
+
+        if (post instanceof AdvancedPost) {
+            const typeInteraction: InteractionType = InteractionType[interactionKey as keyof typeof InteractionType];
+            if (!typeInteraction) {
+                throw new ApplicationError("Tipo de interação inválido.");
+            }
+            
+            const interaction: Interaction = new Interaction(typeInteraction, profile);
+    
+            post.addInteraction(interaction);
+        } else {
+            throw new NotFoundError("Perfil ou post não encontrado.");
         }
     }
 }

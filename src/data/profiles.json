@@ -13,12 +13,7 @@
         "_id": "7"
       }
     ],
-    "_posts": [
-      "1",
-      "4",
-      "7",
-      "10"
-    ],
+    "_posts": [],
     "_requests": [],
     "_type": "User"
   },
@@ -36,12 +31,7 @@
         "_id": "7"
       }
     ],
-    "_posts": [
-      "2",
-      "5",
-      "8",
-      "11"
-    ],
+    "_posts": [],
     "_requests": [],
     "_type": "User"
   },
@@ -62,12 +52,7 @@
         "_id": "434"
       }
     ],
-    "_posts": [
-      "3",
-      "6",
-      "9",
-      "12"
-    ],
+    "_posts": [],
     "_requests": [],
     "_type": "User"
   },
@@ -120,7 +105,10 @@
     "_email": "nicolasraf@gmail.com",
     "_password": "12345",
     "friends": [],
-    "_posts": [],
+    "_posts": [
+      "971",
+      "679"
+    ],
     "_requests": [],
     "_type": "Admin"
   },

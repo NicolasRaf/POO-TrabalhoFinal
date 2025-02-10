@@ -1,10 +1,11 @@
-import { Categories, OptionsPhoto } from "./enum";
+import { console } from "inspector";
+import { Categories, InteractionType, OptionsPhoto } from "./enum";
 import { AlreadyExistsError, ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
 import { AuthenticationError } from "./errs/authetificationError";
 import { Menu, ActionDispatcher } from "./interface";
-import { SocialMedia, Profile, Post, AdvancedProfile } from "./models";
+import { SocialMedia, Profile, Post, AdvancedProfile, AdvancedPost, Interaction } from "./models";
 import { input, DataReader, DataSaver, pressEnter, promptInput, inputEmail} from "./utils";
-import { doubleVerification } from "./utils/io";
+import { doubleVerification, inputInteraction } from "./utils/io";
 
 
 export class App {
@@ -41,9 +42,12 @@ export class App {
             { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this.acceptFriendRequest() },
 
             { name: "Postagens", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Post) },
-            { name: "Postar", category: Categories.Post, action: () => this.createPost() },
+            { name: "Postar", category: Categories.Post, action: () => this._menu.selectCategory(Categories.TyPost) },
+            { name: "Poste Normal", category: Categories.TyPost, action: () => this.createPost("Normal") },
+            { name: "Poste Interativo", category: Categories.TyPost, action: () => this.createPost("Adv") },
             { name: "Listar seus Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser.posts) },
             { name: "Listar Posts de Amigos", category: Categories.Post, action: () => this._socialMedia.listFriendsPosts(this._currentUser.friends) },
+            { name: "Interagir com Post", category: Categories.Post, action: () => this.interactPost() },
             { name: "Deletar Post", category: Categories.Post, action: () => this.handleDeletePost() },
             { name: "Deletar Conta", category: Categories.Princ, action: () => this.handleDeleteAccount() },
         ];
@@ -190,13 +194,36 @@ export class App {
         this.redirectPrincipal()
     }
 
-    private createPost(): void {
+    private createPost(type: string): void {
         const content = input("Digite o conteúdo do post: ");
-        const post = new Post(this.gernerateId(), content, new Date(), this._currentUser);
+        const post = (type === "Normal") ? 
+        new Post(this.gernerateId(), content, new Date(), this._currentUser) : 
+        new AdvancedPost(this.gernerateId(), content, new Date(), this._currentUser);
 
         this._socialMedia.addPost(post);
 
         console.log("Post criado com sucesso!");
+        this.redirectPrincipal();
+    }
+
+    private interactPost(): void {
+        try {
+            const avaliablePosts = this._socialMedia.posts.filter(post => 
+                post.type === "Adv" 
+                && post.profile != this._currentUser
+                && !(post instanceof AdvancedPost && post.interactions.some
+                    (interaction => interaction.author === this._currentUser)));    
+            
+            this._socialMedia.listPosts(avaliablePosts);
+
+            const post: Post = this._socialMedia.searchPost(input("Digite o id do post que deseja interagir: "));
+            const interaction: string = inputInteraction();
+
+            this._socialMedia.interactPost(this._currentUser.id, post.id, interaction);
+            console.log('Interação realizada com sucesso!');
+        } catch (error) {
+            console.error((error as ApplicationError).message);
+        }
         this.redirectPrincipal();
     }
 
@@ -263,39 +290,53 @@ export class App {
             _requests: profile.friendRequests.map(request => ({ _from: request.sender.id, _to: request.receiver.id })),
             _type: (profile instanceof AdvancedProfile) ? "Admin" : "User"
         }));
-
-        const posts = this._socialMedia.posts.map(post => ({
-            _id: post.id,
-            _content: post.content,
-            _date: post.date,
-            _profile: post.profile?.id
-        }));
-
+    
+        const posts = this._socialMedia.posts.map(post => {
+            const basePost = {
+                _id: post.id,
+                _content: post.content,
+                _date: post.date,
+                _profile: post.profile?.id,
+                _type: post.type
+            };
+            if (post instanceof AdvancedPost) {
+                return {
+                    ...basePost,
+                    _interaction: post.interactions.map(interaction => ({
+                        _type: interaction.type,
+                        _author: interaction.author?.id
+                    }))
+                };
+            }
+            return basePost;
+        });
+    
         DataSaver.saveProfiles(profiles);
         DataSaver.savePosts(posts);
     }
+    
+    
 
     public loadData(): void {
         if (this._socialMedia.profiles.length > 0 || this._socialMedia.posts.length > 0) {
             throw new AlreadyExistsError("Dados já carregados.");
         }
-
+    
         const profilesData: any[] = DataReader.readData("profiles");
         const profilesMap: Map<string, Profile> = new Map();
-
+    
         const profiles: Profile[] = profilesData.map(profile => {
             const newProfile = (profile._type === "User") ? 
-            new Profile(
-                profile._id, profile._name, profile._photo, profile._email,
-                profile._password, profile._status, [], [], []) :
-            new AdvancedProfile(
-                profile._id, profile._name, profile._photo, profile._email,
-                profile._password, profile._status, [], [], [])
-            
-                profilesMap.set(newProfile.id, newProfile);
+                new Profile(
+                    profile._id, profile._name, profile._photo, profile._email,
+                    profile._password, profile._status, [], [], []) :
+                new AdvancedProfile(
+                    profile._id, profile._name, profile._photo, profile._email,
+                    profile._password, profile._status, [], [], []);
+            profilesMap.set(newProfile.id, newProfile);
             return newProfile;
         });
-
+    
         profilesData.forEach(profileData => {
             const profile = profilesMap.get(profileData._id);
             if (profile) {
@@ -317,19 +358,32 @@ export class App {
                 }
             }
         });
-
+    
         this._socialMedia.profiles = profiles;
-
+    
         const postsData: any[] = DataReader.readData("posts");
         const posts: Post[] = postsData.map(post => {
             const profile = profilesMap.get(post._profile);
             if (!profile) return null;
-            const newPost = new Post(post._id, post._content, post._date, profile);
-            profile.posts.push(newPost);
+            let newPost;
+            if (post._type === "Normal") {
+                newPost = new Post(post._id, post._content, post._date, profile);
+            } else if (post._type === "Adv") {
+                const interactions = (post._interaction || []).map((interaction: any) => {
+                    const author = profilesMap.get(interaction._author);
+                    if (!author) throw new Error("Autor não encontrado");
+                    return new Interaction(interaction._type, author);
+                });
+                newPost = new AdvancedPost(post._id, post._content, new Date(post._date), profile, interactions);
+            } else {
+                return null;
+            }
+            if (newPost) profile.posts.push(newPost);
             return newPost;
-        }).filter(Boolean) as Post[];
-
+        }).filter((post): post is Post => post !== null);
+    
         this._socialMedia.posts = posts;
+    
         console.log("Dados carregados com sucesso!");
     }
 }
