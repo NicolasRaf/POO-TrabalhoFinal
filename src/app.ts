@@ -190,7 +190,8 @@ export class App {
             _status: profile.status,
             friends: profile.friends.map(friend => ({ _id: friend.id })),
             _posts: profile.posts.map(post => post.id),
-            _requests: profile.friendRequests.map(request => ({ _from: request.sender.id, _to: request.receiver.id }))
+            _requests: profile.friendRequests.map(request => ({ _from: request.sender.id, _to: request.receiver.id })),
+            _type: profile.type
         }));
 
         const posts = this._socialMedia.posts.map(post => ({

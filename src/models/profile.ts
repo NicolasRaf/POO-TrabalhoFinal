@@ -14,6 +14,7 @@ export class Profile {
   private _posts: Post[];
   public friends: Profile[];
   public friendRequests: FriendRequest[];
+  public type : string;
 
   constructor(
     id: string,
@@ -35,6 +36,7 @@ export class Profile {
     this.friends = friends;
     this._posts = posts;
     this.friendRequests = friendRequests;
+    this.type = "Profile";
   }
 
   get email() {
