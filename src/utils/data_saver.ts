@@ -20,4 +20,8 @@ export class DataSaver {
     public static savePosts(posts: any[]): void {
         this.saveData('posts', posts);
     }
+
+    public static saveRequests(requests: any[]): void {
+        this.saveData('requests', requests);
+    }
 }

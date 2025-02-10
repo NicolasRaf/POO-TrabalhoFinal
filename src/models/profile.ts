@@ -2,6 +2,8 @@ import { Post } from "./post";
 import { AlreadyExistsError, NotFoundError } from "../errs";
 import { InactiveProfileError } from "../errs/inactiveProfileError";
 
+type FriendRequest = { sender: Profile; receiver: Profile };
+
 export class Profile {
   private _id: string;
   private _name: string;
@@ -11,9 +13,19 @@ export class Profile {
   private _status: boolean;
   private _posts: Post[];
   public friends: Profile[];
-  public friendRequests: Profile[];
+  public friendRequests: FriendRequest[];
 
-  constructor(id: string, name: string, photo: string, email: string, password: string, status: boolean, friends: Profile[], posts: Post[], friendRequests: Profile[]) {
+  constructor(
+    id: string,
+    name: string,
+    photo: string,
+    email: string,
+    password: string,
+    status: boolean,
+    friends: Profile[],
+    posts: Post[],
+    friendRequests: FriendRequest[] = []
+  ) {
     this._id = id;
     this._name = name;
     this._photo = photo;
@@ -25,7 +37,7 @@ export class Profile {
     this.friendRequests = friendRequests;
   }
 
-  public get email() {
+  get email() {
     return this._email;
   }
 
@@ -35,7 +47,7 @@ export class Profile {
 
   get id() {
     return this._id;
-  } 
+  }
 
   get name() {
     return this._name;
@@ -47,7 +59,7 @@ export class Profile {
 
   get posts() {
     return this._posts;
-  }
+  } 
 
   set status(status: boolean) {
     this._status = status;
@@ -60,7 +72,11 @@ export class Profile {
     this.friends.push(friend);
   }
 
-  private removeFriend(friend: Profile) {
+  public addFriendRequest(request: FriendRequest): void {
+    this.friendRequests.push(request);
+  }
+
+  public removeFriend(friend: Profile) {
     const index = this.friends.indexOf(friend);
     if (index === -1) {
       throw new NotFoundError("Amigo não encontrado.");
@@ -73,10 +89,10 @@ export class Profile {
       throw new AlreadyExistsError("Post já existe.");
     }
 
-    if (this.status === false){
+    if (!this._status) {
       throw new InactiveProfileError("Perfil inativo: Proibido post.");
     }
-    
+
     this._posts.push(post);
   }
 
@@ -84,7 +100,7 @@ export class Profile {
     console.log(`Nome: ${this._name}`);
     console.log(`Foto: ${this._photo}`);
     console.log(`Email: ${this._email}`);
-    console.log(`Status: ${this._status ? "Online" : "Offline"}`);  
+    console.log(`Status: ${this._status ? "Online" : "Offline"}`);
     console.log(this._posts);
   }
 }
