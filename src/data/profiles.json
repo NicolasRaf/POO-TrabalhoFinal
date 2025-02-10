@@ -19,7 +19,8 @@
       "7",
       "10"
     ],
-    "_requests": []
+    "_requests": [],
+    "_type": "User"
   },
   {
     "_id": "6",
@@ -41,7 +42,8 @@
       "8",
       "11"
     ],
-    "_requests": []
+    "_requests": [],
+    "_type": "User"
   },
   {
     "_id": "7",
@@ -66,7 +68,8 @@
       "9",
       "12"
     ],
-    "_requests": []
+    "_requests": [],
+    "_type": "User"
   },
   {
     "_id": "35",
@@ -81,7 +84,8 @@
         "_from": "5",
         "_to": "35"
       }
-    ]
+    ],
+    "_type": "User"
   },
   {
     "_id": "434",
@@ -95,7 +99,8 @@
       }
     ],
     "_posts": [],
-    "_requests": []
+    "_requests": [],
+    "_type": "User"
   },
   {
     "_id": "152",
@@ -105,6 +110,29 @@
     "_password": "4321",
     "friends": [],
     "_posts": [],
-    "_requests": []
+    "_requests": [],
+    "_type": "User"
+  },
+  {
+    "_id": "215",
+    "_name": "NicolasRaf",
+    "_photo": "👍",
+    "_email": "nicolasraf@gmail.com",
+    "_password": "12345",
+    "friends": [],
+    "_posts": [],
+    "_requests": [],
+    "_type": "Admin"
+  },
+  {
+    "_id": "23",
+    "_name": "Conceição",
+    "_photo": "👍",
+    "_email": "ave@gasfd.com",
+    "_password": "123",
+    "friends": [],
+    "_posts": [],
+    "_requests": [],
+    "_type": "User"
   }
 ]

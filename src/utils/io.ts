@@ -18,21 +18,40 @@ export function inputNumber(message: string): number {
     return Number(input(message));
 }
 
+export function getChar(text: string, validChars?: string[]): string {
+    const response = input(text);
+
+    // Check if the input is a single character
+    if (response.length !== 1) {
+        console.log("Entrada inválida! Por favor, insira apenas um caractere.\n");
+        return getChar(text, validChars);
+    }
+
+    // Check if the input is valid
+    if (validChars != undefined){
+        // Check if the character is in the array of valid characters
+        if (!validChars.includes(response.toLowerCase()) && !validChars.includes(response.toUpperCase()) ) {
+            console.log(`Caractere inválido! Por favor, insira um dos seguintes: ${validChars}\n`);
+            return getChar(text, validChars);
+        }
+    }
+    return response;
+}
+
 /**
  * Waits for the user to press Enter.
  * Used to pause the application at the end of the menu loop.
  * @returns {void}
  */
 export function pressEnter(): void {
-    input("Press Enter to continue...");
+    input("\nPressione Enter para voltar ao menu");
 }
 
 export function promptInput(promptMessage: string, errorMessage: string): string {    
     let inputVal: string;
     do {
         inputVal = input(promptMessage).trim();
-        console.log(`DEBUG: username recebido -> "${inputVal}"`); // Adiciona um log para capturar o valor
-        if (!inputVal) console.log(errorMessage);
+        if (!inputVal) throw new InputError(errorMessage);
     } while (!inputVal);
     return inputVal;
 }
@@ -45,4 +64,9 @@ export function inputEmail(): string {
         if (!emailRegex.test(email)) console.log("Invalid email format. Please enter a valid email address.");
     } while (!emailRegex.test(email));
     return email;
+}
+
+export function doubleVerification(message: string): boolean {
+    const response = getChar(message, ["S", "N"]);
+    return response.toLowerCase() === "s";
 }

@@ -1,8 +1,10 @@
 import { Categories, OptionsPhoto } from "./enum";
 import { AlreadyExistsError, ApplicationError, IncorrctPasswordError, NotFoundError } from "./errs";
+import { AuthenticationError } from "./errs/authetificationError";
 import { Menu, ActionDispatcher } from "./interface";
-import { SocialMedia, Profile, Post } from "./models";
+import { SocialMedia, Profile, Post, AdvancedProfile } from "./models";
 import { input, DataReader, DataSaver, pressEnter, promptInput, inputEmail} from "./utils";
+import { doubleVerification } from "./utils/io";
 
 
 export class App {
@@ -20,18 +22,17 @@ export class App {
     }
 
     private _registerActions(): void {
-        ActionDispatcher.registerAction("Cadastro",Categories.Aut, () => this.register());
+        ActionDispatcher.registerAction("Cadastro",Categories.Aut, () => this.register("User"));
+        ActionDispatcher.registerAction("Cadastro Admin","", () => this.register("Admin"));
         ActionDispatcher.registerAction("Login",Categories.Aut, () => this.login());
         ActionDispatcher.registerAction("Carregar dados", "", () => this.loadData());
         ActionDispatcher.registerAction("Salvar dados", "", () => this.saveData());
 
-
         const actions = [
-            { name: "Perfil", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Photo) },
-            { name: "Listar todos os perfis", category: Categories.Princ, action: () => this._socialMedia.listProfiles() },
-            { name: "Listar perfis com nome 'José'", category: Categories.Princ, action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
-            { name: "Listar todos os posts", category: Categories.Princ, action: () => this._socialMedia.listPosts() },
-            { name: "Pesquisar Perfil", category: Categories.Princ, action: () => this._socialMedia.searchProfile(input("Digite o nome do perfil: ")) },
+            { name: "Perfil", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Perfil) },
+            { name: "Seu Perfil", category: Categories.Perfil, action: () => this._socialMedia.detailsProfile(this._currentUser) },
+            { name: "Listar todos os perfis", category: Categories.Perfil, action: () => this._socialMedia.listProfiles() },
+            { name: "Pesquisar Perfil", category: Categories.Perfil, action: () => this.handleSearchProfile() },
 
             { name: "Amizades", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Friendly) },
             { name: "Listar Amigos", category: Categories.Friendly, action: () => this._socialMedia.listProfiles(this._currentUser.friends) },
@@ -40,18 +41,16 @@ export class App {
             { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this.acceptFriendRequest() },
 
             { name: "Postagens", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Post) },
-            { name: "Postar", category: Categories.Post, action: () => this._socialMedia.addPost(new Post("1", "Sdas", new Date(), this._currentUser)) },
-            { name: "Listar Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser.posts) },
+            { name: "Postar", category: Categories.Post, action: () => this.createPost() },
+            { name: "Listar seus Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser.posts) },
             { name: "Listar Posts de Amigos", category: Categories.Post, action: () => this._socialMedia.listFriendsPosts(this._currentUser.friends) },
-            { name: "Deletar Post", category: Categories.Post, action: () => this._socialMedia.deletePost(this._currentUser.posts[0]) },
-            { name: "Deletar Conta", category: Categories.Princ, action: () => this._socialMedia.deleteProfile(this._currentUser) },
+            { name: "Deletar Post", category: Categories.Post, action: () => this.handleDeletePost() },
+            { name: "Deletar Conta", category: Categories.Princ, action: () => this.handleDeleteAccount() },
         ];
 
         actions.forEach(({ name, category, action }) => {
             ActionDispatcher.registerAction(name, category, action);
         }); 
-
-        console.log("Ações registradas com sucesso!");
     }
 
     public run(): void {
@@ -66,9 +65,14 @@ export class App {
         try {
             user = this._socialMedia.searchProfile(email)[0];
             if (user.password !== password) throw new IncorrctPasswordError("Senha incorreta.");
-
             this._currentUser = user;
-            this._menu.selectCategory(Categories.Princ); 
+            user.status = true;
+
+            if (user instanceof AdvancedProfile) {
+                ActionDispatcher.registerAction("Gerenciar Perfil", Categories.Princ, () => this.manageProfiles());
+            }
+          
+            this._menu.selectCategory(Categories.Princ);
         } catch (error) {
             console.error((error as ApplicationError).message);
             pressEnter(); 
@@ -76,46 +80,47 @@ export class App {
         }
     }
 
-    public register(): void {
+    public register(accountType: string): void {
 		const username = promptInput("Nome de usuário: ", "O nome de usuário não pode estar vazio.");
 		const email = inputEmail();
 		const password = promptInput("Senha: ", "A senha não pode estar vazia.");
-	
 		const status: boolean = true;
-		const friends: Profile[] = [];
-		const posts: Post[] = [];
 	
 		try {
-			if (this.isEmailRegistered(email)) {
-				throw new ApplicationError("Email já cadastrado.");
-			}
-	
+			this.isEmailRegistered(email) 
+		
 			const id = this.gernerateId();
 			const photo = this.chooseProfilePhoto();
 	
-			const user = new Profile(id, username, photo, email, password, status, friends, posts);
-			this._socialMedia.addProfile(user);
-	
+			const user = (accountType === "User") ?
+            new Profile(id, username, photo, email, password, status, [], [] ) :
+            new AdvancedProfile(id, username, photo, email, password, status, [], []);
+			
+            this._socialMedia.addProfile(user);
 			console.log("Usuário registrado com sucesso!");
-			pressEnter();
 
-			this._menu.selectCategory(Categories.Princ);
+            if (user instanceof AdvancedProfile) {
+                ActionDispatcher.registerAction("Gerenciar Perfil", Categories.Princ, () => this.manageProfiles());
+            }
+
+            this.redirectPrincipal();
 		} catch (error) {
-			console.error("Erro ao registrar usuário: " + (error as ApplicationError).message);
+            console.error((error as ApplicationError).message);
+            pressEnter(); 
+            this._menu.selectCategory(Categories.Aut);
 		}
 	}
 	
-	private isEmailRegistered(email: string): boolean {
-		try {
-			this._socialMedia.searchProfile(email)[0];
-			return true;
-		} catch (error) {
-			if (error instanceof NotFoundError) {
-				return false;
-			} else {
-				throw error;
-			}
-		}
+	private isEmailRegistered(email: string): void {
+        try {
+            if (this._socialMedia.searchProfile(email).length > 0) {
+                throw new AlreadyExistsError("Email ja cadastrado.");
+            }
+        } catch (error) {
+            if (error instanceof AlreadyExistsError) {
+                console.log(error.message);
+            }
+        }
 	}
 	
 	private chooseProfilePhoto(): string {
@@ -149,12 +154,12 @@ export class App {
             const receiver: Profile = this._socialMedia.searchProfile(input("Digite o id da conta desejada: "))[0];
             this._socialMedia.sendFriendRequest(this._currentUser.id, receiver.id);
 
+            console.log("Solicitação enviada com sucesso!");
         } catch (error) {
             console.error((error as ApplicationError).message);
-            pressEnter(); 
-            this._menu.selectCategory(Categories.Princ);
             return;
         }
+        this.redirectPrincipal();
     }
 
     public acceptFriendRequest(): void {
@@ -163,12 +168,77 @@ export class App {
             const sender: Profile = this._socialMedia.searchProfile(input("Digite o id da conta que deseja aceitar a solicitação: "))[0];
 
             this._socialMedia.acceptFriendRequest(this._currentUser.id, sender.id);
+            console.log("Solicitação aceita com sucesso!");
         } catch (error) {
             console.error((error as ApplicationError).message);
-            pressEnter(); 
-            this._menu.selectCategory(Categories.Princ);
             return;
         }
+
+        this.redirectPrincipal();
+    }
+
+
+    private handleSearchProfile(): void {
+        const identifier: string = input("Digite algum identificador do perfil: ");
+
+        try {
+            this._socialMedia.listProfiles(this._socialMedia.searchProfile(identifier));
+        } catch (error) {
+            console.error((error as ApplicationError).message);
+        }
+        
+        this.redirectPrincipal()
+    }
+
+    private createPost(): void {
+        const content = input("Digite o conteúdo do post: ");
+        const post = new Post(this.gernerateId(), content, new Date(), this._currentUser);
+
+        this._socialMedia.addPost(post);
+
+        console.log("Post criado com sucesso!");
+        this.redirectPrincipal();
+    }
+
+    private handleDeletePost(): void {
+        this._socialMedia.listPosts(this._currentUser.posts)
+
+        const postId = input("Digite o ID do post que deseja deletar: ");
+        const post = this._currentUser.posts.find(p => p.id === postId);
+
+        if (post) {
+            this._socialMedia.deletePost(post);
+            console.warn("Post deletado com sucesso!");
+            this.redirectPrincipal();
+        } else {
+            throw new NotFoundError("Post nao encontrado.");
+        }
+    }
+
+    private handleDeleteAccount(): void {
+        if (!doubleVerification("Voce realmente deseja deletar sua conta?")) {
+            throw new ApplicationError("Operação cancelada pelo usuário.");
+        }
+
+        this._socialMedia.deleteProfile(this._currentUser);
+        console.log("Conta deletada com sucesso!");
+        pressEnter();
+        this._menu.selectCategory(Categories.Aut);
+    }
+
+    private manageProfiles(): void {
+        this._socialMedia.listProfiles();
+
+        const profileId = promptInput("\nDigite o ID do perfil que deseja gerenciar: ", "O ID nao pode estar vazio.");
+        this._socialMedia.switchProfileStatus(profileId);
+
+        console.log("Perfil gerenciado com sucesso!");
+        this.redirectPrincipal()
+    }
+
+    private redirectPrincipal(): void {
+        pressEnter();
+        this._menu.selectCategory(Categories.Princ);
     }
 
     public gernerateId(): string {
@@ -191,7 +261,7 @@ export class App {
             friends: profile.friends.map(friend => ({ _id: friend.id })),
             _posts: profile.posts.map(post => post.id),
             _requests: profile.friendRequests.map(request => ({ _from: request.sender.id, _to: request.receiver.id })),
-            _type: profile.type
+            _type: (profile instanceof AdvancedProfile) ? "Admin" : "User"
         }));
 
         const posts = this._socialMedia.posts.map(post => ({
@@ -214,11 +284,15 @@ export class App {
         const profilesMap: Map<string, Profile> = new Map();
 
         const profiles: Profile[] = profilesData.map(profile => {
-            const newProfile = new Profile(
+            const newProfile = (profile._type === "User") ? 
+            new Profile(
                 profile._id, profile._name, profile._photo, profile._email,
-                profile._password, profile._status, [], []
-            );
-            profilesMap.set(newProfile.id, newProfile);
+                profile._password, profile._status, [], [], []) :
+            new AdvancedProfile(
+                profile._id, profile._name, profile._photo, profile._email,
+                profile._password, profile._status, [], [], [])
+            
+                profilesMap.set(newProfile.id, newProfile);
             return newProfile;
         });
 

@@ -24,7 +24,7 @@ export class SocialMedia {
         if (!this.profiles.includes(profile)) {
             throw new NotFoundError("Perfil nao encontrado.");
         }
-        this.profiles = this.profiles.slice(this.profiles.indexOf(profile), 1);
+        this.profiles = this.profiles.filter(p => p !== profile);
     }
 
     public addPost(post: Post) {
@@ -32,13 +32,14 @@ export class SocialMedia {
             throw new AlreadyExistsError("Post ja cadastrado.");
         }
         this.posts.push(post);
+        post.profile?.addPost(post);
     }
 
     public deletePost(post: Post) {
         if (!this.posts.includes(post)) {
             throw new NotFoundError("Post nao encontrado.");
         }
-        this.posts = this.posts.slice(this.posts.indexOf(post), 1);
+        this.posts = this.posts.filter(p => p !== post);
     }
 
     public searchProfile(identifier: string): Profile[] {
@@ -69,17 +70,21 @@ export class SocialMedia {
         return post;
     }
     
-    public listProfiles(profiles: Profile[] = this.profiles): Profile[] {
-        if (this.profiles.length === 0) {
-            throw new NotFoundError("Nenhum perfil cadastrado.");
+    public detailsProfile(profile: Profile) { 
+        console.log(`\nPerfil de ID ${profile.id}`);
+
+        console.log("=".repeat(30));
+        profile.showProfile();
+        console.log("=".repeat(30));
+    }
+
+    public listProfiles(profiles: Profile[] = this.profiles ): Profile[] {
+        if (profiles.length === 0) {
+            throw new NotFoundError("Nenhum perfil encontrado.");
         }
         
         for (let profile of profiles) {
-            console.log(`\nPerfil de ID ${profile.id}`);
-
-            console.log("=".repeat(30));
-            profile.showProfile();
-            console.log("=".repeat(30));
+            this.detailsProfile(profile);
         };  
 
         return this.profiles;
@@ -116,6 +121,7 @@ export class SocialMedia {
 
     public switchProfileStatus(identifier: string): void {
         const profile: Profile = this.searchProfile(identifier)[0];
+        
         profile.status = !profile.status;
     }
 

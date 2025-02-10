@@ -20,7 +20,7 @@ export class Menu {
         if (this._currentCategory !== Categories.Aut && 
             this._currentCategory !== Categories.Princ && 
             !ActionDispatcher.listActions(this._currentCategory).includes("Voltar")) {
-            ActionDispatcher.registerAction("Sair", this._currentCategory, () => this.selectCategory(Categories.Princ));
+            ActionDispatcher.registerAction("Voltar", this._currentCategory, () => this.selectCategory(Categories.Princ));
         }
     }
 
@@ -90,6 +90,16 @@ export class Menu {
                 process.stdin.once("data", () => this.start());
 
                 return;
+            } else if (key.name === "backspace" && this._currentCategory === Categories.Aut) {
+                this._running = false;
+                process.stdin.setRawMode(false);
+                process.stdin.removeAllListeners("keypress");
+
+                console.clear()
+                console.log(`======= Admin ========`);
+                ActionDispatcher.executeAction("Cadastro Admin");
+                console.log("\nPressione Enter para voltar ao menu.");
+                process.stdin.once("data", () => this.start());
             } else if (key.name === "escape") {
                 this.exitApp();
             }

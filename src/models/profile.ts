@@ -36,7 +36,7 @@ export class Profile {
     this.friends = friends;
     this._posts = posts;
     this.friendRequests = friendRequests;
-    this.type = "Profile";
+    this.type = "User";
   }
 
   get email() {
@@ -86,7 +86,7 @@ export class Profile {
     this.friends.splice(index, 1);
   }
 
-  private addPost(post: Post) {
+  public addPost(post: Post) {
     if (this._posts.includes(post)) {
       throw new AlreadyExistsError("Post já existe.");
     }
