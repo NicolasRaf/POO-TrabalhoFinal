@@ -7,41 +7,46 @@ import { input, DataReader, DataSaver, pressEnter, promptInput, inputEmail} from
 
 export class App {
     private _socialMedia: SocialMedia;
-    private _currentUser?: Profile;
+    private _currentUser!: Profile;
     private _menu: Menu;
 
     constructor() {
         this._socialMedia = new SocialMedia();
         this._registerActions(); 
-        this._menu = new Menu(Categories.Princ);
+        this._menu = new Menu(Categories.Aut);
 
 		this.loadData();
         console.log("Iniciando o app...");
     }
 
     private _registerActions(): void {
+        ActionDispatcher.registerAction("Cadastro",Categories.Aut, () => this.register());
+        ActionDispatcher.registerAction("Login",Categories.Aut, () => this.login());
+
         const actions = [
+            { name: "Perfil", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Photo) },
             { name: "Listar todos os perfis", category: Categories.Princ, action: () => this._socialMedia.listProfiles() },
             { name: "Listar perfis com nome 'José'", category: Categories.Princ, action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
             { name: "Listar todos os posts", category: Categories.Princ, action: () => this._socialMedia.listPosts() },
-            { name: "Cadastro", category: Categories.Aut, action: () => this.register() },
-            { name: "Login", category: Categories.Aut, action: () => this.login() },
             { name: "Carregar dados", category: Categories.Princ, action: () => this.loadData() },
             { name: "Salvar dados", category: Categories.Princ, action: () => this.saveData() },
             { name: "Pesquisar Perfil", category: Categories.Princ, action: () => this._socialMedia.searchProfile(input("Digite o nome do perfil: ")) },
             { name: "Amizades", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Friendly) },
-            { name: "Enviar Solicitacao", category: Categories.Friendly, action: () => this._socialMedia.sendFriendRequest(this._currentUser!.name, promptInput("Digite o nome da conta paezao: ", "Conta não encontrada")) },
-            { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this._socialMedia.acceptFriendRequest(this._currentUser!.name, promptInput("Digite o nome da conta paezao: ", "Conta não encontrada")) },
-            { name: "Postar", category: Categories.Post, action: () => this._socialMedia.addPost(this._currentUser!) },
-            { name: "Listar Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser!) },
-            { name: "Listar Posts de Amigos", category: Categories.Post, action: () => this._socialMedia.listFriendsPosts(this._currentUser!) },
-            { name: "Deletar Post", category: Categories.Post, action: () => this._socialMedia.deletePost(this._currentUser!) },
-            { name: "Deletar Conta", category: Categories.Princ, action: () => this._socialMedia.deleteProfile(this._currentUser!) },
+            { name: "Enviar Solicitacao", category: Categories.Friendly, action: () => this.sendFriendRequest() },
+            { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this._socialMedia.acceptFriendRequest(this._currentUser.id, promptInput("Digite o nome da conta paezao: ", "Conta não encontrada")) },
+            { name: "Postagens", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Post) },
+            { name: "Postar", category: Categories.Post, action: () => this._socialMedia.addPost(new Post("1", "Sdas", new Date(), this._currentUser)) },
+            { name: "Listar Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser.posts) },
+            { name: "Listar Posts de Amigos", category: Categories.Post, action: () => this._socialMedia.listFriendsPosts(this._currentUser.friends) },
+            { name: "Deletar Post", category: Categories.Post, action: () => this._socialMedia.deletePost(this._currentUser.posts[0]) },
+            { name: "Deletar Conta", category: Categories.Princ, action: () => this._socialMedia.deleteProfile(this._currentUser) },
         ];
 
         actions.forEach(({ name, category, action }) => {
             ActionDispatcher.registerAction(name, category, action);
-        });
+        }); 
+
+        console.log("Ações registradas com sucesso!");
     }
 
     public run(): void {
@@ -61,7 +66,8 @@ export class App {
             this._menu.selectCategory(Categories.Princ); 
         } catch (error) {
             console.error((error as ApplicationError).message);
-            this._menu.selectCategory(Categories.Aut); 
+            pressEnter(); 
+            this._menu.selectCategory(Categories.Aut);
         }
     }
 
@@ -87,6 +93,7 @@ export class App {
 	
 			console.log("Usuário registrado com sucesso!");
 			pressEnter();
+
 			this._menu.selectCategory(Categories.Princ);
 		} catch (error) {
 			console.error("Erro ao registrar usuário: " + (error as ApplicationError).message);
@@ -123,7 +130,28 @@ export class App {
 		}
 		return photo;
 	}
-	
+    
+    public sendFriendRequest(): void {
+        
+        try {
+            const name: string = input("Digite o nome da conta que deseja enviar uma solicitacao: ");
+            const receivers: Profile[] = this._socialMedia.searchProfile(name);
+
+            receivers.forEach(receiver => {
+                console.log(`${receiver.id} - Conta: ${receiver.name}, Email: ${receiver.email}`);
+            })
+             
+            const receiver: Profile = this._socialMedia.searchProfile(input("Digite o id da conta desejada: "))[0];
+            this._socialMedia.sendFriendRequest(this._currentUser.id, receiver.id);
+
+        } catch (error) {
+            console.error((error as ApplicationError).message);
+            pressEnter(); 
+            this._menu.selectCategory(Categories.Princ);
+            return;
+        }
+    }
+
     public gernerateId(): string {
         let id = Math.floor(Math.random() * 1000).toString(); 
 
@@ -141,28 +169,28 @@ export class App {
             _email: profile.email,
             _password: profile.password,
             _status: profile.status,
-            friends: profile.friends.map(friend => ({
-                _id: friend.id,
-                _name: friend.name,
-                _photo: friend.photo,
-                _email: friend.email,
-                _password: friend.password,
-                _status: friend.status
-            })), // Salva os detalhes dos amigos
-            _posts: profile.posts.map(post => post.id) // Salva apenas os IDs dos posts
+            friends: profile.friends.map(friend => ({ _id: friend.id })),
+            _posts: profile.posts.map(post => post.id),
+            _requests: profile.friendRequests.map(request => ({ _from: request.sender.id, _to: request.receiver.id }))
         }));
-    
+
         const posts = this._socialMedia.posts.map(post => ({
             _id: post.id,
             _content: post.content,
             _date: post.date,
-            _profile: post.profile?.id // Salva apenas o ID do perfil
+            _profile: post.profile?.id
         }));
-    
+
+        const friendRequests = this._socialMedia._friendRequests.map(request => ({
+            _from: request.sender.id,
+            _to: request.receiver.id
+        }));
+
         DataSaver.saveProfiles(profiles);
         DataSaver.savePosts(posts);
+        DataSaver.saveRequests(friendRequests);
     }
-    
+
     public loadData(): void {
         if (this._socialMedia.profiles.length > 0 || this._socialMedia.posts.length > 0) {
             throw new AlreadyExistsError("Dados já carregados.");
@@ -170,58 +198,50 @@ export class App {
 
         const profilesData: any[] = DataReader.readData("profiles");
         const profilesMap: Map<string, Profile> = new Map();
-    
-        // Cria perfis sem amigos
-        const profiles: Profile[] = profilesData.map((profile) => {
+
+        const profiles: Profile[] = profilesData.map(profile => {
             const newProfile = new Profile(
-                profile._id,
-                profile._name,
-                profile._photo,
-                profile._email,
-                profile._password,
-                profile._status,
-                [],
-                []
+                profile._id, profile._name, profile._photo, profile._email,
+                profile._password, profile._status, [], []
             );
             profilesMap.set(newProfile.id, newProfile);
             return newProfile;
         });
-    
-        // Associa os amigos aos perfis
-        profilesData.forEach((profileData) => {
+
+        profilesData.forEach(profileData => {
             const profile = profilesMap.get(profileData._id);
-            if (profile && profileData.friends) {
-                profile.friends = profileData.friends.map((friendData: any) => profilesMap.get(friendData._id)).filter((friend: Profile) => friend !== undefined);
+            if (profile) {
+                // Atribui amigos
+                if (profileData.friends) {
+                    profile.friends = profileData.friends.map((friend: any) => profilesMap.get(friend._id)).filter(Boolean);
+                }
+                // Atribui solicitações de amizade
+                if (profileData._requests) {
+                    profileData._requests.forEach((request: any) => {
+                        const sender = profilesMap.get(request._from);
+                        const receiver = profilesMap.get(request._to);
+                        if (sender && receiver) {
+                            const friendRequest = { sender, receiver };
+                            profile.friendRequests.push(friendRequest);
+                            this._socialMedia._friendRequests.push(friendRequest);
+                        }
+                    });
+                }
             }
         });
-    
+
         this._socialMedia.profiles = profiles;
-    
+
         const postsData: any[] = DataReader.readData("posts");
-        const posts: Post[] = postsData.map((post) => {
-            const profileId = post._profile;
-            const profile = profilesMap.get(profileId);
-    
-            if (!profile) {
-                console.warn(`Perfil não encontrado para o post com ID ${post._id}`);
-                return null;
-            }
-    
-            const newPost = new Post(
-                post._id,
-                post._content,
-                post._date,
-                profile
-            );
-    
-            profile.posts.push(newPost); // Adiciona o post à lista de posts do perfil
-    
+        const posts: Post[] = postsData.map(post => {
+            const profile = profilesMap.get(post._profile);
+            if (!profile) return null;
+            const newPost = new Post(post._id, post._content, post._date, profile);
+            profile.posts.push(newPost);
             return newPost;
-        }).filter(post => post !== null) as Post[];
-    
+        }).filter(Boolean) as Post[];
+
         this._socialMedia.posts = posts;
-    
         console.log("Dados carregados com sucesso!");
-    }    
-    
+    }
 }

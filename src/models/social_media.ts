@@ -5,12 +5,12 @@ import { Interaction, Profile, AdvancedProfile, Post, AdvancedPost } from "./"
 export class SocialMedia {
     public profiles: Profile[];
     public posts: Post[];
-    private _friendRequests: Map<Profile, Profile>;
+    public _friendRequests: Array<{ sender: Profile, receiver: Profile }>;
 
     constructor() {
         this.profiles = [];
         this.posts = [];
-        this._friendRequests = new Map();
+        this._friendRequests = [];
     }
    
     public addProfile(profile: Profile) {
@@ -20,11 +20,25 @@ export class SocialMedia {
         this.profiles.push(profile);
     }
 
+    public deleteProfile(profile: Profile) {
+        if (!this.profiles.includes(profile)) {
+            throw new NotFoundError("Perfil nao encontrado.");
+        }
+        this.profiles = this.profiles.slice(this.profiles.indexOf(profile), 1);
+    }
+
     public addPost(post: Post) {
         if (this.posts.includes(post)) {
             throw new AlreadyExistsError("Post ja cadastrado.");
         }
         this.posts.push(post);
+    }
+
+    public deletePost(post: Post) {
+        if (!this.posts.includes(post)) {
+            throw new NotFoundError("Post nao encontrado.");
+        }
+        this.posts = this.posts.slice(this.posts.indexOf(post), 1);
     }
 
     public searchProfile(identifier: string): Profile[] {
@@ -87,49 +101,89 @@ export class SocialMedia {
         return this.posts;
     }
 
+    public listFriendsPosts(friends: Profile[]): void {
+        if (friends.length === 0) {
+            throw new NotFoundError("Nenhum amigo cadastrado.");
+        } 
+        
+        friends.forEach(friend => {
+            console.log(`\nPostagens de ${friend.name}`);
+            console.log("=".repeat(30));
+            this.posts.filter(post => post.profile === friend).forEach(post => post.showPost());
+            console.log("=".repeat(30));
+        });
+    }
+
     public switchProfileStatus(identifier: string): void {
         const profile: Profile = this.searchProfile(identifier)[0];
         profile.status = !profile.status;
     }
 
-    public sendFriendRequest(profileIndetifier: string, friendIdentifier: string): void {
-        const profile: Profile = this.searchProfile(profileIndetifier)[0];
-        const friend: Profile = this.searchProfile(friendIdentifier)[0];
-
-        this._friendRequests.set(profile, friend);
-    }
-
-    public acceptFriendRequest(profileIdentifier: string, friendIdentifier: string): void {
-        const profile: Profile = this.searchProfile(profileIdentifier)[0];  
-        const friend: Profile = this.searchProfile(friendIdentifier)[0];    
+    public sendFriendRequest(senderIdentifier: string, receiverIdentifier: string): void {
+        const sender: Profile = this.searchProfile(senderIdentifier)[0];
+        const receiver: Profile = this.searchProfile(receiverIdentifier)[0];
     
-        if (this._friendRequests.get(profile) === friend) {
-            profile.addFriend(friend);
-            friend.addFriend(profile);
-            
-            this._friendRequests.delete(profile);
-        } else {
-            throw new NotFoundError("Solicitação nao encontrada.");	
+        if (this._friendRequests.some(req => req.sender === sender && req.receiver === receiver)) {
+          throw new AlreadyExistsError("Solicitação de amizade já enviada.");
         }
-    }
-
-    public declineFriendRequest(profileIdentifier: string, friendIdentifier: string): void {
-        const profile: Profile = this.searchProfile(profileIdentifier)[0];
-        const friend: Profile = this.searchProfile(friendIdentifier)[0];    
     
-        this._friendRequests.forEach((sender, receiver) => {
-            if (receiver === profile && sender === friend) {
-                this._friendRequests.delete(receiver);
-            }
+        if (sender.friends.includes(receiver)) {
+          throw new AlreadyExistsError("Este usuário já é seu amigo.");
+        }
+    
+        receiver.addFriendRequest({ sender, receiver });
+        this._friendRequests.push({ sender, receiver });
+      }
+
+      public acceptFriendRequest(receiverIdentifier: string, senderIdentifier: string): void {
+        const receiver = this.searchProfile(receiverIdentifier)[0];
+        const sender = this.searchProfile(senderIdentifier)[0];
+    
+        const requestIndex = this._friendRequests.findIndex(req => req.sender === sender && req.receiver === receiver);
+    
+        if (requestIndex === -1) {
+          throw new NotFoundError("Solicitação de amizade não encontrada.");
+        }
+    
+        receiver.addFriend(sender);
+        sender.addFriend(receiver);
+    
+        this._friendRequests.splice(requestIndex, 1);
+        receiver.friendRequests = receiver.friendRequests.filter(req => req.sender !== sender);
+      }
+    
+
+      public declineFriendRequest(receiverIdentifier: string, senderIdentifier: string): void {
+        const receiver = this.searchProfile(receiverIdentifier)[0];
+        const sender = this.searchProfile(senderIdentifier)[0];
+    
+        const requestIndex = this._friendRequests.findIndex(req => req.sender === sender && req.receiver === receiver);
+    
+        if (requestIndex === -1) {
+          throw new NotFoundError("Solicitação de amizade não encontrada.");
+        }
+    
+        this._friendRequests.splice(requestIndex, 1);
+        receiver.friendRequests = receiver.friendRequests.filter(req => req.sender !== sender);
+      }
+
+    public listFriendRequests(user: Profile): void {
+        if (user.friendRequests.length === 0) {
+          console.log("Nenhuma solicitação de amizade pendente.");
+          return;
+        }
+        console.log(`Solicitações de amizade recebidas:`);
+        user.friendRequests.forEach(request => {
+          console.log(`- De: ${request.sender.name} (${request.sender.email})`);
         });
-    }
+      }
 
     public interactPost(profileIdentifier: string, postIdentifier: string): void {
         const profile: Profile = this.searchProfile(profileIdentifier)[0];  
-        const post: Post = this.posts.filter(post => post.id === postIdentifier)[0];    
+        const post: Post = this.posts.find(post => post.id === postIdentifier)!;    
         
         if (profile.status && post instanceof AdvancedPost) {
-            post.addInteraction(new Interaction( InteractionType.curtir, profile));
+            post.addInteraction(new Interaction(InteractionType.curtir, profile));
         }
     }
 }

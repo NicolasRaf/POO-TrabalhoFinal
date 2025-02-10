@@ -7,4 +7,5 @@ export enum Categories {
     Friendly = "Amizades",
     Post = "Postagens",
     Search = "Pesquisar",
+
 }

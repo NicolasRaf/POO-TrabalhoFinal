@@ -4,21 +4,13 @@
     "_name": "Miguel",
     "_photo": "😎",
     "_email": "email5@gmail.com",
-    "_password": "Olá",
+    "_password": "ola",
     "friends": [
       {
-        "_id": "6",
-        "_name": "Ana",
-        "_photo": "🌟",
-        "_email": "email6@gmail.com",
-        "_password": "Olá"
+        "_id": "6"
       },
       {
-        "_id": "7",
-        "_name": "Pedro",
-        "_photo": "🕵️‍♂️",
-        "_email": "email7@gmail.com",
-        "_password": "Oi"
+        "_id": "7"
       }
     ],
     "_posts": [
@@ -26,7 +18,8 @@
       "4",
       "7",
       "10"
-    ]
+    ],
+    "_requests": []
   },
   {
     "_id": "6",
@@ -36,18 +29,10 @@
     "_password": "Olá",
     "friends": [
       {
-        "_id": "5",
-        "_name": "Miguel",
-        "_photo": "😎",
-        "_email": "email5@gmail.com",
-        "_password": "Olá"
+        "_id": "5"
       },
       {
-        "_id": "7",
-        "_name": "Pedro",
-        "_photo": "🕵️‍♂️",
-        "_email": "email7@gmail.com",
-        "_password": "Oi"
+        "_id": "7"
       }
     ],
     "_posts": [
@@ -55,7 +40,8 @@
       "5",
       "8",
       "11"
-    ]
+    ],
+    "_requests": []
   },
   {
     "_id": "7",
@@ -65,18 +51,10 @@
     "_password": "Oi",
     "friends": [
       {
-        "_id": "5",
-        "_name": "Miguel",
-        "_photo": "😎",
-        "_email": "email5@gmail.com",
-        "_password": "Olá"
+        "_id": "5"
       },
       {
-        "_id": "6",
-        "_name": "Ana",
-        "_photo": "🌟",
-        "_email": "email6@gmail.com",
-        "_password": "Olá"
+        "_id": "6"
       }
     ],
     "_posts": [
@@ -84,6 +62,32 @@
       "6",
       "9",
       "12"
+    ],
+    "_requests": []
+  },
+  {
+    "_id": "35",
+    "_name": "iglesio",
+    "_photo": "😯",
+    "_email": "iglesio@gmail.com",
+    "_password": "iglesio",
+    "friends": [],
+    "_posts": [],
+    "_requests": [
+      {
+        "_from": "5",
+        "_to": "35"
+      }
     ]
+  },
+  {
+    "_id": "434",
+    "_name": "Nicolas",
+    "_photo": "👍",
+    "_email": "nicolas@gmail.com",
+    "_password": "123",
+    "friends": [],
+    "_posts": [],
+    "_requests": []
   }
 ]
