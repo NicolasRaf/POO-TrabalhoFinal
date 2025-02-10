@@ -22,18 +22,23 @@ export class App {
     private _registerActions(): void {
         ActionDispatcher.registerAction("Cadastro",Categories.Aut, () => this.register());
         ActionDispatcher.registerAction("Login",Categories.Aut, () => this.login());
+        ActionDispatcher.registerAction("Carregar dados", "", () => this.loadData());
+        ActionDispatcher.registerAction("Salvar dados", "", () => this.saveData());
+
 
         const actions = [
             { name: "Perfil", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Photo) },
             { name: "Listar todos os perfis", category: Categories.Princ, action: () => this._socialMedia.listProfiles() },
             { name: "Listar perfis com nome 'José'", category: Categories.Princ, action: () => this._socialMedia.listProfiles(this._socialMedia.searchProfile("José")) },
             { name: "Listar todos os posts", category: Categories.Princ, action: () => this._socialMedia.listPosts() },
-            { name: "Carregar dados", category: Categories.Princ, action: () => this.loadData() },
-            { name: "Salvar dados", category: Categories.Princ, action: () => this.saveData() },
             { name: "Pesquisar Perfil", category: Categories.Princ, action: () => this._socialMedia.searchProfile(input("Digite o nome do perfil: ")) },
+
             { name: "Amizades", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Friendly) },
+            { name: "Listar Amigos", category: Categories.Friendly, action: () => this._socialMedia.listProfiles(this._currentUser.friends) },
+            { name: "Listar Solicitações", category: Categories.Friendly, action: () => this._socialMedia.listFriendRequests(this._currentUser)},
             { name: "Enviar Solicitacao", category: Categories.Friendly, action: () => this.sendFriendRequest() },
-            { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this._socialMedia.acceptFriendRequest(this._currentUser.id, promptInput("Digite o nome da conta paezao: ", "Conta não encontrada")) },
+            { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this.acceptFriendRequest() },
+
             { name: "Postagens", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Post) },
             { name: "Postar", category: Categories.Post, action: () => this._socialMedia.addPost(new Post("1", "Sdas", new Date(), this._currentUser)) },
             { name: "Listar Posts", category: Categories.Post, action: () => this._socialMedia.listPosts(this._currentUser.posts) },
@@ -152,6 +157,20 @@ export class App {
         }
     }
 
+    public acceptFriendRequest(): void {
+        try {
+            this._socialMedia.listFriendRequests(this._currentUser);
+            const sender: Profile = this._socialMedia.searchProfile(input("Digite o id da conta que deseja aceitar a solicitação: "))[0];
+
+            this._socialMedia.acceptFriendRequest(this._currentUser.id, sender.id);
+        } catch (error) {
+            console.error((error as ApplicationError).message);
+            pressEnter(); 
+            this._menu.selectCategory(Categories.Princ);
+            return;
+        }
+    }
+
     public gernerateId(): string {
         let id = Math.floor(Math.random() * 1000).toString(); 
 
@@ -181,14 +200,8 @@ export class App {
             _profile: post.profile?.id
         }));
 
-        const friendRequests = this._socialMedia._friendRequests.map(request => ({
-            _from: request.sender.id,
-            _to: request.receiver.id
-        }));
-
         DataSaver.saveProfiles(profiles);
         DataSaver.savePosts(posts);
-        DataSaver.saveRequests(friendRequests);
     }
 
     public loadData(): void {

@@ -101,6 +101,5 @@ export class Profile {
     console.log(`Foto: ${this._photo}`);
     console.log(`Email: ${this._email}`);
     console.log(`Status: ${this._status ? "Online" : "Offline"}`);
-    console.log(this._posts);
   }
 }

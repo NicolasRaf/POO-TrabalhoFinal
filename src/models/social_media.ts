@@ -169,12 +169,11 @@ export class SocialMedia {
 
     public listFriendRequests(user: Profile): void {
         if (user.friendRequests.length === 0) {
-          console.log("Nenhuma solicitação de amizade pendente.");
-          return;
+          throw new NotFoundError("Nenhuma solicitação de amizade pendente.");
         }
         console.log(`Solicitações de amizade recebidas:`);
         user.friendRequests.forEach(request => {
-          console.log(`- De: ${request.sender.name} (${request.sender.email})`);
+          console.log(`- De: ${request.sender.id} - ${request.sender.name} - (${request.sender.email})`);
         });
       }
 

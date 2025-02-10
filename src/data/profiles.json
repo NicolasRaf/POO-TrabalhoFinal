@@ -55,6 +55,9 @@
       },
       {
         "_id": "6"
+      },
+      {
+        "_id": "434"
       }
     ],
     "_posts": [
@@ -86,6 +89,20 @@
     "_photo": "👍",
     "_email": "nicolas@gmail.com",
     "_password": "123",
+    "friends": [
+      {
+        "_id": "7"
+      }
+    ],
+    "_posts": [],
+    "_requests": []
+  },
+  {
+    "_id": "152",
+    "_name": "Claudio",
+    "_photo": "🤣",
+    "_email": "arthur@gmail.com",
+    "_password": "4321",
     "friends": [],
     "_posts": [],
     "_requests": []
