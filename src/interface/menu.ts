@@ -88,7 +88,7 @@ export class Menu {
 
                 console.log("\nPressione Enter para voltar ao menu.");
                 process.stdin.once("data", () => this.start());
-
+                
                 return;
             } else if (key.name === "backspace" && this._currentCategory === Categories.Aut) {
                 this._running = false;

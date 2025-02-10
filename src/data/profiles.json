@@ -122,5 +122,16 @@
     "_posts": [],
     "_requests": [],
     "_type": "User"
+  },
+  {
+    "_id": "529",
+    "_name": "Nicolas",
+    "_photo": "👍",
+    "_email": "asdas@gmail.com",
+    "_password": "1234",
+    "friends": [],
+    "_posts": [],
+    "_requests": [],
+    "_type": "User"
   }
 ]
