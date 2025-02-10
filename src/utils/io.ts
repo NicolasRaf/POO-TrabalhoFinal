@@ -52,7 +52,7 @@ export function promptInput(promptMessage: string, errorMessage: string): string
     let inputVal: string;
     do {
         inputVal = input(promptMessage).trim();
-        if (!inputVal) throw new InputError(errorMessage);
+        if (!inputVal) console.log(errorMessage);
     } while (!inputVal);
     return inputVal;
 }
@@ -90,3 +90,4 @@ export function inputInteraction(): string {
         return inputInteraction();
     }
 }
+

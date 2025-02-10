@@ -1,5 +1,6 @@
 import { InteractionType } from "../enum/interactions";
 import { AlreadyExistsError, ApplicationError, NotFoundError } from "../errs";
+import { pressEnter } from "../utils";
 import { Interaction, Profile, AdvancedProfile, Post, AdvancedPost } from "./"
 
 export class SocialMedia {
@@ -156,6 +157,15 @@ export class SocialMedia {
     
         this._friendRequests.splice(requestIndex, 1);
         receiver.friendRequests = receiver.friendRequests.filter(req => req.sender !== sender);
+      }
+
+      public removeFriend(profile: Profile, friend: Profile): void {
+        if (!profile.friends.includes(friend)) {
+          throw new NotFoundError("Este usuário não é seu amigo.");
+        }
+
+        profile.removeFriend(friend);
+        friend.removeFriend(profile);
       }
     
 

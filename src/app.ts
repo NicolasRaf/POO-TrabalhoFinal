@@ -40,6 +40,7 @@ export class App {
             { name: "Listar Solicitações", category: Categories.Friendly, action: () => this._socialMedia.listFriendRequests(this._currentUser)},
             { name: "Enviar Solicitacao", category: Categories.Friendly, action: () => this.sendFriendRequest() },
             { name: "Aceitar Solicitacao", category: Categories.Friendly, action: () => this.acceptFriendRequest() },
+            { name: "Remover Amigo", category: Categories.Friendly, action: () => this.removeFriend() },
 
             { name: "Postagens", category: Categories.Princ, action: () => this._menu.selectCategory(Categories.Post) },
             { name: "Postar", category: Categories.Post, action: () => this._menu.selectCategory(Categories.TyPost) },
@@ -107,7 +108,8 @@ export class App {
                 ActionDispatcher.registerAction("Gerenciar Perfil", Categories.Princ, () => this.manageProfiles());
             }
 
-            this.redirectPrincipal();
+            pressEnter(); 
+            this._menu.selectCategory(Categories.Aut);
 		} catch (error) {
             console.error((error as ApplicationError).message);
             pressEnter(); 
@@ -151,42 +153,45 @@ export class App {
             const name: string = input("Digite o nome da conta que deseja enviar uma solicitacao: ");
             const receivers: Profile[] = this._socialMedia.searchProfile(name);
 
-            receivers.forEach(receiver => {
-                console.log(`${receiver.id} - Conta: ${receiver.name}, Email: ${receiver.email}`);
-            })
+            this._socialMedia.listProfiles(receivers);
              
-            const receiver: Profile = this._socialMedia.searchProfile(input("Digite o id da conta desejada: "))[0];
-            this._socialMedia.sendFriendRequest(this._currentUser.id, receiver.id);
+            const receiver: string = input("Digite o id da conta desejada: ");
+            this._socialMedia.sendFriendRequest(this._currentUser.id, receiver);
 
             console.log("Solicitação enviada com sucesso!");
         } catch (error) {
             console.error((error as ApplicationError).message);
-            return;
         }
         this.redirectPrincipal();
     }
 
     public acceptFriendRequest(): void {
-        try {
-            this._socialMedia.listFriendRequests(this._currentUser);
-            const sender: Profile = this._socialMedia.searchProfile(input("Digite o id da conta que deseja aceitar a solicitação: "))[0];
+        this._socialMedia.listFriendRequests(this._currentUser);
+        const sender: Profile = this._socialMedia.searchProfile(input("Digite o id da conta que deseja aceitar a solicitação: "))[0];
 
-            this._socialMedia.acceptFriendRequest(this._currentUser.id, sender.id);
-            console.log("Solicitação aceita com sucesso!");
-        } catch (error) {
-            console.error((error as ApplicationError).message);
-            return;
-        }
+        this._socialMedia.acceptFriendRequest(this._currentUser.id, sender.id);
+        console.log("Solicitação aceita com sucesso!");
+
 
         this.redirectPrincipal();
     }
 
+    public removeFriend() {
+        this._socialMedia.listProfiles(this._currentUser.friends);
+
+        const friend: Profile = this._socialMedia.searchProfile(input("Digite o id da conta que deseja remover: "))[0];
+        this._socialMedia.removeFriend(this._currentUser, friend);
+
+        console.log("Amigo removido com sucesso!");
+        this.redirectPrincipal();
+    }
 
     private handleSearchProfile(): void {
         const identifier: string = input("Digite algum identificador do perfil: ");
 
         try {
-            this._socialMedia.listProfiles(this._socialMedia.searchProfile(identifier));
+            const profiles = this._socialMedia.searchProfile(identifier)
+            this._socialMedia.listProfiles(profiles);
         } catch (error) {
             console.error((error as ApplicationError).message);
         }
@@ -235,15 +240,17 @@ export class App {
 
         if (post) {
             this._socialMedia.deletePost(post);
-            console.warn("Post deletado com sucesso!");
-            this.redirectPrincipal();
+            this._currentUser.removePost(post);
         } else {
             throw new NotFoundError("Post nao encontrado.");
         }
+
+        console.warn("Post deletado com sucesso!");
+        this.redirectPrincipal();
     }
 
     private handleDeleteAccount(): void {
-        if (!doubleVerification("Voce realmente deseja deletar sua conta?")) {
+        if (!doubleVerification("Voce realmente deseja deletar sua conta?(S|N): ")) {
             throw new ApplicationError("Operação cancelada pelo usuário.");
         }
 
@@ -370,8 +377,8 @@ export class App {
                 newPost = new Post(post._id, post._content, post._date, profile);
             } else if (post._type === "Adv") {
                 const interactions = (post._interaction || []).map((interaction: any) => {
-                    const author = profilesMap.get(interaction._author);
-                    if (!author) throw new Error("Autor não encontrado");
+                    let author = profilesMap.get(interaction._author);
+                    if (!author) author = new Profile("0", "Anônimo", "", "", "", true, [], [], []);
                     return new Interaction(interaction._type, author);
                 });
                 newPost = new AdvancedPost(post._id, post._content, new Date(post._date), profile, interactions);

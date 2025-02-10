@@ -98,6 +98,14 @@ export class Profile {
     this._posts.push(post);
   }
 
+  public removePost(post: Post) {
+    const index = this._posts.indexOf(post);
+    if (index === -1) {
+      throw new NotFoundError("Post não encontrado.");
+    }
+    this._posts.splice(index, 1);
+  }
+
   public showProfile() {
     console.log(`Nome: ${this._name}`);
     console.log(`Foto: ${this._photo}`);
